@@ -1,18 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">CuacaKu</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_favorites">Favorites</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Home & Search -->
     <string name="search_city">Search city</string>
     <string name="search">Search</string>
+    <string name="use_my_location">Use my location</string>
+    <string name="location_permission_denied">Location permission denied</string>
+    <string name="my_location">My Location</string>
+    <string name="last_updated">Last updated: %1$s</string>
+    <string name="offline_banner">Offline mode, last updated: %1$s</string>
+    <string name="add_to_favorites">Add to favorites</string>
+    <string name="remove_from_favorites">Remove from favorites</string>
+    <string name="added_to_favorites">Added to favorites</string>
+    <string name="removed_from_favorites">Removed from favorites</string>
+
+    <!-- Weather Stats & Titles -->
     <string name="humidity">Humidity</string>
     <string name="wind">Wind</string>
     <string name="feels_like">Feels like</string>
     <string name="hourly_title">Next 24 hours</string>
+    <string name="temp_chart_title">Temperature Trend</string>
     <string name="daily_title">7-day forecast</string>
+    <string name="details_title">Weather Details</string>
+    <string name="pressure">Air Pressure</string>
+    <string name="cloud_cover">Cloud Cover</string>
+    <string name="wind_direction">Wind Direction</string>
+    <string name="visibility">Visibility</string>
+    <string name="uv_index">UV Index</string>
+    <string name="sunrise">Sunrise</string>
+    <string name="sunset">Sunset</string>
+    <string name="precipitation_sum">Total Rainfall</string>
+    <string name="rain_probability">Rain Probability</string>
     <string name="error_network">Failed to load data. Check your internet connection.</string>
     <string name="retry">Retry</string>
-    <string name="choose_language">Choose language</string>
     <string name="close">Close</string>
+
+    <!-- UV Index Categories -->
+    <string name="uv_low">Low</string>
+    <string name="uv_moderate">Moderate</string>
+    <string name="uv_high">High</string>
+    <string name="uv_very_high">Very High</string>
+    <string name="uv_extreme">Extreme</string>
+
+    <!-- Wind Directions -->
+    <string name="dir_n">North</string>
+    <string name="dir_ne">North East</string>
+    <string name="dir_e">East</string>
+    <string name="dir_se">South East</string>
+    <string name="dir_s">South</string>
+    <string name="dir_sw">South West</string>
+    <string name="dir_w">West</string>
+    <string name="dir_nw">North West</string>
+
+    <!-- Air Quality -->
+    <string name="air_quality_title">Air Quality Index (AQI)</string>
+    <string name="aqi_good">Good</string>
+    <string name="aqi_moderate">Moderate</string>
+    <string name="aqi_unhealthy_sensitive">Sensitive Groups</string>
+    <string name="aqi_unhealthy">Unhealthy</string>
+    <string name="aqi_very_unhealthy">Very Unhealthy</string>
+    <string name="aqi_hazardous">Hazardous</string>
+    <string name="aqi_unavailable">Air quality data unavailable</string>
+
+    <!-- Tips -->
+    <string name="tips_title">Today\'s Advice</string>
+    <string name="tip_rain">High chance of rain today, don\'t forget to bring an umbrella!</string>
+    <string name="tip_uv">UV index is high, apply sunscreen and wear a hat outdoors.</string>
+    <string name="tip_heat">It is quite hot today, stay hydrated by drinking enough water.</string>
+    <string name="tip_cold">Weather is cold, remember to wear a jacket or warm clothes.</string>
+    <string name="tip_wind">Strong winds today, ride and drive with extra caution.</string>
+    <string name="tip_aqi">Air quality is unhealthy, reduce outdoor activities and wear a mask.</string>
+    <string name="tip_clear">Beautiful clear weather, perfect for outdoor activities!</string>
+
+    <!-- Day Detail Dialog -->
+    <string name="day_detail_title">Day Details</string>
+
+    <!-- Favorites Screen -->
+    <string name="favorites_title">Favorite Cities</string>
+    <string name="empty_favorites">No favorite cities yet</string>
+    <string name="empty_favorites_desc">Add cities to favorites from the search bar on Home screen</string>
+    <string name="delete_favorite_title">Delete Favorite</string>
+    <string name="delete_favorite_confirm">Are you sure you want to remove %1$s from favorites?</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Settings</string>
+    <string name="unit_settings">Units</string>
+    <string name="temp_unit">Temperature Unit</string>
+    <string name="wind_unit">Wind Speed Unit</string>
+    <string name="theme_settings">Appearance</string>
+    <string name="theme_mode">Theme Mode</string>
+    <string name="theme_system">Follow System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="language_settings">Language</string>
+    <string name="choose_language">Choose Language</string>
+    <string name="about_section">About</string>
+    <string name="app_version">Version</string>
+    <string name="data_source">Data Source</string>
+    <string name="data_source_value">Open-Meteo (Free Open Weather API)</string>
+
+    <!-- Weather Codes -->
     <string name="w_clear">Clear</string>
+    <string name="w_clear_night">Clear Night</string>
     <string name="w_partly">Partly cloudy</string>
     <string name="w_cloudy">Cloudy</string>
     <string name="w_fog">Fog</string>

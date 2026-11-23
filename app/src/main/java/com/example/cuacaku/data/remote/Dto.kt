@@ -25,7 +25,17 @@ data class Current(
     @SerializedName("wind_speed_10m")
     val windSpeed: Double,
     @SerializedName("weather_code")
-    val weatherCode: Int
+    val weatherCode: Int,
+    @SerializedName("is_day")
+    val isDay: Int = 1,
+    @SerializedName("pressure_msl")
+    val pressureMsl: Double = 1013.25,
+    @SerializedName("cloud_cover")
+    val cloudCover: Int = 0,
+    @SerializedName("wind_direction_10m")
+    val windDirection: Double = 0.0,
+    @SerializedName("visibility")
+    val visibility: Double = 10000.0
 )
 
 /** Data prakiraan per jam */
@@ -47,7 +57,15 @@ data class Daily(
     @SerializedName("temperature_2m_min")
     val minTemp: List<Double>,
     @SerializedName("precipitation_probability_max")
-    val rain: List<Int?>
+    val rain: List<Int?>,
+    @SerializedName("sunrise")
+    val sunrise: List<String>? = null,
+    @SerializedName("sunset")
+    val sunset: List<String>? = null,
+    @SerializedName("uv_index_max")
+    val uvIndexMax: List<Double>? = null,
+    @SerializedName("precipitation_sum")
+    val precipitationSum: List<Double>? = null
 )
 
 // =====================================================
@@ -66,4 +84,24 @@ data class GeoResult(
     val longitude: Double,
     val country: String?,
     val admin1: String?
+)
+
+// =====================================================
+// Data class untuk respon Air Quality API (AQI)
+// =====================================================
+
+/** Respon utama dari endpoint /v1/air-quality */
+data class AirQualityResponse(
+    val current: AirQualityCurrent?
+)
+
+/** Data kualitas udara saat ini */
+data class AirQualityCurrent(
+    val time: String? = null,
+    @SerializedName("us_aqi")
+    val usAqi: Int? = null,
+    @SerializedName("pm10")
+    val pm10: Double? = null,
+    @SerializedName("pm2_5")
+    val pm25: Double? = null
 )

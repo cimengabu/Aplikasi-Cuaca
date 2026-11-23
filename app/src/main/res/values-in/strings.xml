@@ -1,18 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">CuacaKu</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Beranda</string>
+    <string name="nav_favorites">Favorit</string>
+    <string name="nav_settings">Pengaturan</string>
+
+    <!-- Home & Search -->
     <string name="search_city">Cari kota</string>
     <string name="search">Cari</string>
+    <string name="use_my_location">Gunakan lokasi saya</string>
+    <string name="location_permission_denied">Izin lokasi ditolak</string>
+    <string name="my_location">Lokasi Saya</string>
+    <string name="last_updated">Terakhir diperbarui: %1$s</string>
+    <string name="offline_banner">Mode offline, data terakhir diperbarui: %1$s</string>
+    <string name="add_to_favorites">Tambah ke favorit</string>
+    <string name="remove_from_favorites">Hapus dari favorit</string>
+    <string name="added_to_favorites">Ditambahkan ke favorit</string>
+    <string name="removed_from_favorites">Dihapus dari favorit</string>
+
+    <!-- Weather Stats & Titles -->
     <string name="humidity">Kelembapan</string>
     <string name="wind">Angin</string>
     <string name="feels_like">Terasa</string>
     <string name="hourly_title">24 jam ke depan</string>
+    <string name="temp_chart_title">Grafik Tren Suhu</string>
     <string name="daily_title">Prakiraan 7 hari</string>
+    <string name="details_title">Detail Cuaca</string>
+    <string name="pressure">Tekanan Udara</string>
+    <string name="cloud_cover">Tutupan Awan</string>
+    <string name="wind_direction">Arah Angin</string>
+    <string name="visibility">Jarak Pandang</string>
+    <string name="uv_index">Indeks UV</string>
+    <string name="sunrise">Matahari Terbit</string>
+    <string name="sunset">Matahari Terbenam</string>
+    <string name="precipitation_sum">Curah Hujan</string>
+    <string name="rain_probability">Peluang Hujan</string>
     <string name="error_network">Gagal memuat data. Periksa koneksi internetmu.</string>
     <string name="retry">Coba lagi</string>
-    <string name="choose_language">Pilih bahasa</string>
     <string name="close">Tutup</string>
+
+    <!-- UV Index Categories -->
+    <string name="uv_low">Rendah</string>
+    <string name="uv_moderate">Sedang</string>
+    <string name="uv_high">Tinggi</string>
+    <string name="uv_very_high">Sangat Tinggi</string>
+    <string name="uv_extreme">Ekstrem</string>
+
+    <!-- Wind Directions -->
+    <string name="dir_n">Utara</string>
+    <string name="dir_ne">Timur Laut</string>
+    <string name="dir_e">Timur</string>
+    <string name="dir_se">Tenggara</string>
+    <string name="dir_s">Selatan</string>
+    <string name="dir_sw">Barat Daya</string>
+    <string name="dir_w">Barat</string>
+    <string name="dir_nw">Barat Laut</string>
+
+    <!-- Air Quality -->
+    <string name="air_quality_title">Kualitas Udara (AQI)</string>
+    <string name="aqi_good">Baik</string>
+    <string name="aqi_moderate">Sedang</string>
+    <string name="aqi_unhealthy_sensitive">Kelompok Sensitif</string>
+    <string name="aqi_unhealthy">Tidak Sehat</string>
+    <string name="aqi_very_unhealthy">Sangat Tidak Sehat</string>
+    <string name="aqi_hazardous">Berbahaya</string>
+    <string name="aqi_unavailable">Data kualitas udara tidak tersedia</string>
+
+    <!-- Tips -->
+    <string name="tips_title">Saran Hari Ini</string>
+    <string name="tip_rain">Peluang hujan tinggi, jangan lupa bawa payung!</string>
+    <string name="tip_uv">Indeks UV tinggi, gunakan tabir surya dan topi saat di luar.</string>
+    <string name="tip_heat">Cuaca cukup panas, cukupi kebutuhan cairan dengan minum air.</string>
+    <string name="tip_cold">Suhu dingin, kenakan jaket atau pakaian hangat.</string>
+    <string name="tip_wind">Angin cukup kencang, berhati-hatilah saat berkendara.</string>
+    <string name="tip_aqi">Kualitas udara kurang baik, kurangi aktivitas luar dan pakai masker.</string>
+    <string name="tip_clear">Cuaca cerah dan bersahabat, cocok untuk beraktivitas di luar ruangan!</string>
+
+    <!-- Day Detail Dialog -->
+    <string name="day_detail_title">Detail Prakiraan</string>
+
+    <!-- Favorites Screen -->
+    <string name="favorites_title">Kota Favorit</string>
+    <string name="empty_favorites">Belum ada kota favorit</string>
+    <string name="empty_favorites_desc">Tambahkan kota ke favorit dari pencarian di halaman Beranda</string>
+    <string name="delete_favorite_title">Hapus Favorit</string>
+    <string name="delete_favorite_confirm">Apakah kamu yakin ingin menghapus %1$s dari favorit?</string>
+    <string name="delete">Hapus</string>
+    <string name="cancel">Batal</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Pengaturan</string>
+    <string name="unit_settings">Satuan</string>
+    <string name="temp_unit">Satuan Suhu</string>
+    <string name="wind_unit">Satuan Kecepatan Angin</string>
+    <string name="theme_settings">Tampilan &amp; Tema</string>
+    <string name="theme_mode">Mode Tema</string>
+    <string name="theme_system">Ikuti Sistem</string>
+    <string name="theme_light">Terang</string>
+    <string name="theme_dark">Gelap</string>
+    <string name="language_settings">Bahasa</string>
+    <string name="choose_language">Pilih Bahasa</string>
+    <string name="about_section">Tentang</string>
+    <string name="app_version">Versi</string>
+    <string name="data_source">Sumber Data</string>
+    <string name="data_source_value">Open-Meteo (API Cuaca Terbuka &amp; Gratis)</string>
+
+    <!-- Weather Codes -->
     <string name="w_clear">Cerah</string>
+    <string name="w_clear_night">Cerah Malam</string>
     <string name="w_partly">Berawan sebagian</string>
     <string name="w_cloudy">Berawan</string>
     <string name="w_fog">Berkabut</string>

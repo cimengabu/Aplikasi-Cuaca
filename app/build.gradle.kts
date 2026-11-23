@@ -42,13 +42,21 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.navigation.compose)
 
     // AndroidX core & lifecycle
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
+
+    // DataStore Preferences untuk penyimpanan lokal permanen
+    implementation(libs.androidx.datastore.preferences)
+
+    // Google Play Services Location untuk GPS
+    implementation(libs.play.services.location)
 
     // AppCompat — untuk DayNight theme & per-app language
     implementation(libs.androidx.appcompat)

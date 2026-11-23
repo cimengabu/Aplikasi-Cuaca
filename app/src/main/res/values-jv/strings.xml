@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CuacaKu</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Griya</string>
+    <string name="nav_favorites">Favorit</string>
+    <string name="nav_settings">Setelan</string>
+
+    <!-- Home & Search -->
+    <string name="search_city">Pados kitha</string>
+    <string name="search">Pados</string>
+    <string name="use_my_location">Ngunakaken lokasi kula</string>
+    <string name="location_permission_denied">Izin lokasi dipuntolak</string>
+    <string name="my_location">Lokasi Kula</string>
+    <string name="last_updated">Paling akhir dianyari: %1$s</string>
+    <string name="offline_banner">Mode offline, data pungkasan dianyari: %1$s</string>
+    <string name="add_to_favorites">Tambahaken dhateng favorit</string>
+    <string name="remove_from_favorites">Busak saking favorit</string>
+    <string name="added_to_favorites">Ditambahaken dhateng favorit</string>
+    <string name="removed_from_favorites">Dibusak saking favorit</string>
+
+    <!-- Weather Stats & Titles -->
+    <string name="humidity">Kelembapan</string>
+    <string name="wind">Angin</string>
+    <string name="feels_like">Kraos kados</string>
+    <string name="hourly_title">24 jam salajengipun</string>
+    <string name="temp_chart_title">Grafik Tren Suhu</string>
+    <string name="daily_title">Prakiraan 7 dinten</string>
+    <string name="details_title">Rincian Cuaca</string>
+    <string name="pressure">Tekanan Hawa</string>
+    <string name="cloud_cover">Tutupan Mendhung</string>
+    <string name="wind_direction">Enering Angin</string>
+    <string name="visibility">Jarak Pandeng</string>
+    <string name="uv_index">Indeks UV</string>
+    <string name="sunrise">Srengenge Plethek</string>
+    <string name="sunset">Srengenge Surup</string>
+    <string name="precipitation_sum">Curah Udan</string>
+    <string name="rain_probability">Peluang Udan</string>
+    <string name="error_network">Gagal mendhet data. Priksa sambungan internet sampeyan.</string>
+    <string name="retry">Cobi malih</string>
+    <string name="close">Tutup</string>
+
+    <!-- UV Index Categories -->
+    <string name="uv_low">Andhap</string>
+    <string name="uv_moderate">Sedheng</string>
+    <string name="uv_high">Inggil</string>
+    <string name="uv_very_high">Inggil Sanget</string>
+    <string name="uv_extreme">Ekstrem</string>
+
+    <!-- Wind Directions -->
+    <string name="dir_n">Lor</string>
+    <string name="dir_ne">Lor Wetan</string>
+    <string name="dir_e">Wetan</string>
+    <string name="dir_se">Kidul Wetan</string>
+    <string name="dir_s">Kidul</string>
+    <string name="dir_sw">Kidul Kulon</string>
+    <string name="dir_w">Kulon</string>
+    <string name="dir_nw">Lor Kulon</string>
+
+    <!-- Air Quality -->
+    <string name="air_quality_title">Kualitas Hawa (AQI)</string>
+    <string name="aqi_good">Sae</string>
+    <string name="aqi_moderate">Sedheng</string>
+    <string name="aqi_unhealthy_sensitive">Kelompok Sensitif</string>
+    <string name="aqi_unhealthy">Mboten Sae</string>
+    <string name="aqi_very_unhealthy">Sanget Mboten Sae</string>
+    <string name="aqi_hazardous">Mbebayani</string>
+    <string name="aqi_unavailable">Data kualitas hawa mboten wonten</string>
+
+    <!-- Tips -->
+    <string name="tips_title">Pitedah Dinten Menika</string>
+    <string name="tip_rain">Wonten potensi udan ageng, ampun kesupen bekto payung!</string>
+    <string name="tip_uv">Indeks UV inggil, gunakaken tabir surya lan kupluk wonten ing njawi.</string>
+    <string name="tip_heat">Hawa kraos benter, cekapaken ngunjuk toya bening.</string>
+    <string name="tip_cold">Hawa asrep, monggo ngagem jaket utawi rasukan anget.</string>
+    <string name="tip_wind">Angin sembribit banter, ngatos-atos menawi nitih tetumpakan.</string>
+    <string name="tip_aqi">Kualitas hawa kirang sae, sudaaken kegiyatan ing njawi lan agem masker.</string>
+    <string name="tip_clear">Hawa padhang sumringah, cocog kagem kegiyatan wonten ing njawi!</string>
+
+    <!-- Day Detail Dialog -->
+    <string name="day_detail_title">Rincian Prakiraan</string>
+
+    <!-- Favorites Screen -->
+    <string name="favorites_title">Kitha Favorit</string>
+    <string name="empty_favorites">Dereng wonten kitha favorit</string>
+    <string name="empty_favorites_desc">Tambahaken kitha dhateng favorit saking padosan ing Griya</string>
+    <string name="delete_favorite_title">Busak Favorit</string>
+    <string name="delete_favorite_confirm">Menapa sampeyan saestu badhe mbusak %1$s saking favorit?</string>
+    <string name="delete">Busak</string>
+    <string name="cancel">Batal</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Setelan</string>
+    <string name="unit_settings">Satuan</string>
+    <string name="temp_unit">Satuan Suhu</string>
+    <string name="wind_unit">Satuan Bantere Angin</string>
+    <string name="theme_settings">Tampilan &amp; Tema</string>
+    <string name="theme_mode">Mode Tema</string>
+    <string name="theme_system">Nderek Sistem</string>
+    <string name="theme_light">Padhang</string>
+    <string name="theme_dark">Peteng</string>
+    <string name="language_settings">Basa</string>
+    <string name="choose_language">Pilih Basa</string>
+    <string name="about_section">Babagan</string>
+    <string name="app_version">Versi</string>
+    <string name="data_source">Sumber Data</string>
+    <string name="data_source_value">Open-Meteo (API Cuaca Gratis &amp; Bikak)</string>
+
+    <!-- Weather Codes -->
+    <string name="w_clear">Padhang</string>
+    <string name="w_clear_night">Padhang Dalu</string>
+    <string name="w_partly">Rada Mendhung</string>
+    <string name="w_cloudy">Mendhung</string>
+    <string name="w_fog">Pedhut</string>
+    <string name="w_drizzle">Grimis</string>
+    <string name="w_rain">Udan</string>
+    <string name="w_snow">Salju</string>
+    <string name="w_thunder">Prahara bledheg</string>
+    <string name="w_unknown">Mboten mangertos</string>
+</resources>

@@ -1,19 +1,24 @@
 package com.example.cuacaku
 
-import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.getValue
 import androidx.core.os.LocaleListCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.cuacaku.ui.HomeScreen
+import com.example.cuacaku.ui.FavoritesViewModel
+import com.example.cuacaku.ui.SettingsViewModel
 import com.example.cuacaku.ui.WeatherViewModel
+import com.example.cuacaku.ui.navigation.AppNavigation
 import com.example.cuacaku.ui.theme.CuacaKuTheme
 
 // =====================================================
-// MainActivity — activity utama, turunan AppCompatActivity
+// MainActivity — Activity utama aplikasi CuacaKu
+// Turunan AppCompatActivity untuk mendukung DayNight & per-app language
 // =====================================================
 class MainActivity : AppCompatActivity() {
 
@@ -22,36 +27,43 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
 
         setContent {
-            CuacaKuTheme {
-                val viewModel: WeatherViewModel = viewModel()
-                HomeScreen(
-                    viewModel = viewModel,
-                    onToggleTheme = { toggleTheme() },
-                    onChangeLanguage = { lang -> changeLanguage(lang) }
+            val settingsViewModel: SettingsViewModel = viewModel()
+            val themeMode by settingsViewModel.themeMode.collectAsStateWithLifecycle()
+
+            // Menyesuaikan tema terang / gelap berdasarkan pengaturan yang dipilih
+            val isDarkTheme = when (themeMode) {
+                "LIGHT" -> false
+                "DARK" -> true
+                else -> isSystemInDarkTheme()
+            }
+
+            CuacaKuTheme(darkTheme = isDarkTheme) {
+                val weatherViewModel: WeatherViewModel = viewModel()
+                val favoritesViewModel: FavoritesViewModel = viewModel()
+
+                AppNavigation(
+                    weatherViewModel = weatherViewModel,
+                    favoritesViewModel = favoritesViewModel,
+                    settingsViewModel = settingsViewModel,
+                    onApplyTheme = { mode -> applyTheme(mode) },
+                    onApplyLanguage = { langTag -> applyLanguage(langTag) }
                 )
             }
         }
     }
 
-    /**
-     * Ganti tema terang <-> gelap.
-     * Membaca mode saat ini dari konfigurasi, lalu set ke kebalikannya.
-     */
-    private fun toggleTheme() {
-        val currentMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-        val newMode = if (currentMode == Configuration.UI_MODE_NIGHT_YES) {
-            AppCompatDelegate.MODE_NIGHT_NO
-        } else {
-            AppCompatDelegate.MODE_NIGHT_YES
+    /** Menerapkan mode tema langsung lewat AppCompatDelegate */
+    private fun applyTheme(mode: String) {
+        val nightMode = when (mode) {
+            "LIGHT" -> AppCompatDelegate.MODE_NIGHT_NO
+            "DARK" -> AppCompatDelegate.MODE_NIGHT_YES
+            else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
         }
-        AppCompatDelegate.setDefaultNightMode(newMode)
+        AppCompatDelegate.setDefaultNightMode(nightMode)
     }
 
-    /**
-     * Ganti bahasa aplikasi.
-     * Menerima tag bahasa ("id" atau "en") lalu terapkan lewat AppCompat.
-     */
-    private fun changeLanguage(langTag: String) {
+    /** Menerapkan bahasa aplikasi langsung lewat AppCompatDelegate */
+    private fun applyLanguage(langTag: String) {
         val locales = LocaleListCompat.forLanguageTags(langTag)
         AppCompatDelegate.setApplicationLocales(locales)
     }

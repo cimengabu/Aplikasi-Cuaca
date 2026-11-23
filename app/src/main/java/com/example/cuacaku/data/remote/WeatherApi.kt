@@ -13,9 +13,9 @@ interface WeatherApi {
     suspend fun getForecast(
         @Query("latitude") latitude: Double,
         @Query("longitude") longitude: Double,
-        @Query("current") current: String = "temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code",
+        @Query("current") current: String = "temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code,is_day,pressure_msl,cloud_cover,wind_direction_10m,visibility",
         @Query("hourly") hourly: String = "temperature_2m,weather_code",
-        @Query("daily") daily: String = "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max",
+        @Query("daily") daily: String = "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset,uv_index_max,precipitation_sum",
         @Query("timezone") timezone: String = "auto",
         @Query("forecast_days") forecastDays: Int = 7
     ): WeatherResponse
@@ -34,8 +34,20 @@ interface GeocodingApi {
 }
 
 // =====================================================
+// Interface Retrofit untuk Air Quality API
+// =====================================================
+interface AirQualityApi {
+    @GET("v1/air-quality")
+    suspend fun getAirQuality(
+        @Query("latitude") latitude: Double,
+        @Query("longitude") longitude: Double,
+        @Query("current") current: String = "us_aqi,pm10,pm2_5",
+        @Query("timezone") timezone: String = "auto"
+    ): AirQualityResponse
+}
+
+// =====================================================
 // Singleton untuk membuat instance Retrofit
-// Dua instance terpisah karena base URL berbeda
 // =====================================================
 object NetworkModule {
     /** Retrofit untuk API cuaca (forecast) */
@@ -54,5 +66,14 @@ object NetworkModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(GeocodingApi::class.java)
+    }
+
+    /** Retrofit untuk API kualitas udara (AQI) */
+    val airQualityApi: AirQualityApi by lazy {
+        Retrofit.Builder()
+            .baseUrl("https://air-quality-api.open-meteo.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(AirQualityApi::class.java)
     }
 }
