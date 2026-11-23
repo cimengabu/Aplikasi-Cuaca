@@ -27,15 +27,18 @@ import com.example.cuacaku.R
 import com.example.cuacaku.util.DirectionHelper
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 import kotlin.math.roundToInt
 
 // =====================================================
 // WeatherDetailsCard — Grid 2-kolom kartu detail cuaca
+// Termasuk Curah Hujan (mm) dan Tutupan Awan (%)
 // =====================================================
 @Composable
 fun WeatherDetailsCard(
     pressureMsl: Double,
     cloudCover: Int,
+    precipitation: Double,
     windDirection: Double,
     visibility: Double,
     uvIndexMax: Double?,
@@ -73,9 +76,30 @@ fun WeatherDetailsCard(
             )
         }
 
-        // Baris 2: Arah Angin & Jarak Pandang
-        val windDirRes = DirectionHelper.getWindDirectionRes(windDirection)
+        // Baris 2: Curah Hujan & Jarak Pandang (Masalah 1)
         val visibilityKm = (visibility / 1000.0)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            DetailItem(
+                emoji = "🌧️",
+                title = stringResource(R.string.precipitation_label),
+                value = String.format(Locale.US, "%.1f mm", precipitation),
+                modifier = Modifier.weight(1f)
+            )
+            DetailItem(
+                emoji = "👁️",
+                title = stringResource(R.string.visibility),
+                value = String.format(Locale.US, "%.1f km", visibilityKm),
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        // Baris 3: Arah Angin & Indeks UV
+        val windDirRes = DirectionHelper.getWindDirectionRes(windDirection)
+        val (uvLabelRes, uvColor) = getUvCategory(uvIndexMax ?: 0.0)
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -87,24 +111,8 @@ fun WeatherDetailsCard(
                 subtitle = "${windDirection.roundToInt()}°",
                 modifier = Modifier.weight(1f)
             )
-            DetailItem(
-                emoji = "👁️",
-                title = stringResource(R.string.visibility),
-                value = String.format("%.1f km", visibilityKm),
-                modifier = Modifier.weight(1f)
-            )
-        }
 
-        // Baris 3: Indeks UV & Matahari
-        val (uvLabelRes, uvColor) = getUvCategory(uvIndexMax ?: 0.0)
-        val formattedSunrise = formatSunTime(sunrise)
-        val formattedSunset = formatSunTime(sunset)
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            // Indeks UV
+            // Indeks UV Card
             Card(
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(16.dp),
@@ -124,54 +132,54 @@ fun WeatherDetailsCard(
                         )
                     }
                     Spacer(Modifier.height(8.dp))
-                    Text(
-                        text = uvIndexMax?.let { String.format("%.1f", it) } ?: "-",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(uvColor)
-                            .padding(horizontal = 8.dp, vertical = 2.dp)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = stringResource(uvLabelRes),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold
+                            text = uvIndexMax?.let { String.format(Locale.US, "%.1f", it) } ?: "-",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(uvColor)
+                                .padding(horizontal = 8.dp, vertical = 2.dp)
+                        ) {
+                            Text(
+                                text = stringResource(uvLabelRes),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
                 }
             }
+        }
 
-            // Matahari Terbit & Terbenam
-            Card(
-                modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-            ) {
-                Column(
-                    modifier = Modifier.padding(14.dp),
-                    horizontalAlignment = Alignment.Start
-                ) {
-                    Text(
-                        text = "🌅 ${stringResource(R.string.sunrise)}: $formattedSunrise",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Spacer(Modifier.height(10.dp))
-                    Text(
-                        text = "🌇 ${stringResource(R.string.sunset)}: $formattedSunset",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            }
+        // Baris 4: Matahari Terbit & Matahari Terbenam
+        val formattedSunrise = formatSunTime(sunrise)
+        val formattedSunset = formatSunTime(sunset)
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            DetailItem(
+                emoji = "🌅",
+                title = stringResource(R.string.sunrise),
+                value = formattedSunrise,
+                modifier = Modifier.weight(1f)
+            )
+            DetailItem(
+                emoji = "🌇",
+                title = stringResource(R.string.sunset),
+                value = formattedSunset,
+                modifier = Modifier.weight(1f)
+            )
         }
     }
 }

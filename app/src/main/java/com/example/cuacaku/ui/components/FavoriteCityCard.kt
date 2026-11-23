@@ -36,10 +36,11 @@ import com.example.cuacaku.R
 import com.example.cuacaku.ui.FavoriteWeatherItem
 import com.example.cuacaku.util.TempUnit
 import com.example.cuacaku.util.UnitConverter
-import com.example.cuacaku.util.weatherLabel
+import com.example.cuacaku.util.resolveCurrentWeather
 
 // =====================================================
 // FavoriteCityCard — Kartu kota di halaman Favorit
+// Menggunakan resolusi cuaca akurat
 // =====================================================
 @Composable
 fun FavoriteCityCard(
@@ -116,8 +117,13 @@ fun FavoriteCityCard(
                         strokeWidth = 2.dp
                     )
                 } else if (item.temperature != null && item.weatherCode != null) {
-                    val (_, emoji) = weatherLabel(item.weatherCode, isDay = true)
-                    Text(text = emoji, fontSize = 28.sp)
+                    val resolved = resolveCurrentWeather(
+                        code = item.weatherCode,
+                        precipitation = item.precipitation ?: 0.0,
+                        cloudCover = item.cloudCover ?: 0,
+                        isDay = true
+                    )
+                    Text(text = resolved.emoji, fontSize = 28.sp)
                     Spacer(Modifier.width(8.dp))
                     Text(
                         text = UnitConverter.formatTemperature(item.temperature, tempUnit),

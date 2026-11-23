@@ -19,6 +19,8 @@ data class FavoriteWeatherItem(
     val city: FavoriteCity,
     val temperature: Double? = null,
     val weatherCode: Int? = null,
+    val precipitation: Double? = null,
+    val cloudCover: Int? = null,
     val isLoading: Boolean = false
 )
 
@@ -65,6 +67,8 @@ class FavoritesViewModel(application: Application) : AndroidViewModel(applicatio
                     item.copy(
                         temperature = res.current.temperature,
                         weatherCode = res.current.weatherCode,
+                        precipitation = res.current.precipitation,
+                        cloudCover = res.current.cloudCover,
                         isLoading = false
                     )
                 } catch (_: Exception) {

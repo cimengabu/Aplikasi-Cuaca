@@ -290,7 +290,7 @@ fun SettingsScreen(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = "${stringResource(R.string.app_version)}: 2.0",
+                            text = "${stringResource(R.string.app_version)}: 2.1",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                         )
@@ -298,6 +298,12 @@ fun SettingsScreen(
                             text = "${stringResource(R.string.data_source)}: ${stringResource(R.string.data_source_value)}",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                        )
+                        // Teks kecil Sumber: Open-Meteo (model prakiraan)
+                        Text(
+                            text = stringResource(R.string.data_source_forecast_model),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f)
                         )
                     }
                 }

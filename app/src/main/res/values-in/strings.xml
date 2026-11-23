@@ -11,7 +11,14 @@
     <string name="search_city">Cari kota</string>
     <string name="search">Cari</string>
     <string name="use_my_location">Gunakan lokasi saya</string>
-    <string name="location_permission_denied">Izin lokasi ditolak</string>
+    <string name="location_permission_denied">Izin lokasi ditolak.</string>
+    <string name="location_permission_permanently_denied">Izin lokasi dinonaktifkan. Silakan izinkan di Pengaturan Aplikasi.</string>
+    <string name="location_services_disabled">Layanan lokasi nonaktif. Silakan aktifkan GPS.</string>
+    <string name="open_location_settings">Aktifkan GPS</string>
+    <string name="open_app_settings">Pengaturan</string>
+    <string name="location_not_found">Lokasi tidak ditemukan. Silakan coba lagi.</string>
+    <string name="location_detected">Lokasi diatur ke %1$s</string>
+    <string name="gps_fetching">Sedang mengambil lokasi…</string>
     <string name="my_location">Lokasi Saya</string>
     <string name="last_updated">Terakhir diperbarui: %1$s</string>
     <string name="offline_banner">Mode offline, data terakhir diperbarui: %1$s</string>
@@ -19,6 +26,11 @@
     <string name="remove_from_favorites">Hapus dari favorit</string>
     <string name="added_to_favorites">Ditambahkan ke favorit</string>
     <string name="removed_from_favorites">Dihapus dari favorit</string>
+
+    <!-- First Launch Welcome Banner -->
+    <string name="welcome_title">Selamat Datang di CuacaKu</string>
+    <string name="welcome_desc">Gunakan lokasi saat ini dengan GPS atau cari kota untuk mulai melihat prakiraan cuaca yang akurat.</string>
+    <string name="welcome_use_gps">Gunakan Lokasi Saya</string>
 
     <!-- Weather Stats & Titles -->
     <string name="humidity">Kelembapan</string>
@@ -35,7 +47,10 @@
     <string name="uv_index">Indeks UV</string>
     <string name="sunrise">Matahari Terbit</string>
     <string name="sunset">Matahari Terbenam</string>
+    <string name="precipitation_label">Curah Hujan</string>
     <string name="precipitation_sum">Curah Hujan</string>
+    <string name="precipitation_val">Curah hujan: %1$s mm</string>
+    <string name="cloud_cover_val">Awan: %1$d%%</string>
     <string name="rain_probability">Peluang Hujan</string>
     <string name="error_network">Gagal memuat data. Periksa koneksi internetmu.</string>
     <string name="retry">Coba lagi</string>
@@ -106,6 +121,7 @@
     <string name="app_version">Versi</string>
     <string name="data_source">Sumber Data</string>
     <string name="data_source_value">Open-Meteo (API Cuaca Terbuka &amp; Gratis)</string>
+    <string name="data_source_forecast_model">Sumber: Open-Meteo (model prakiraan)</string>
 
     <!-- Weather Codes -->
     <string name="w_clear">Cerah</string>
@@ -115,6 +131,7 @@
     <string name="w_fog">Berkabut</string>
     <string name="w_drizzle">Gerimis</string>
     <string name="w_rain">Hujan</string>
+    <string name="w_heavy_rain">Hujan lebat</string>
     <string name="w_snow">Salju</string>
     <string name="w_thunder">Badai petir</string>
     <string name="w_unknown">Tidak diketahui</string>

@@ -3,6 +3,7 @@ package com.example.cuacaku.data.local
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -27,6 +28,7 @@ class SettingsRepository(private val context: Context) {
         val KEY_LAST_CITY_NAME = stringPreferencesKey("last_city_name")
         val KEY_LAST_LAT = doublePreferencesKey("last_city_lat")
         val KEY_LAST_LON = doublePreferencesKey("last_city_lon")
+        val KEY_HAS_SAVED_CITY = booleanPreferencesKey("has_saved_city")
     }
 
     /** Flow satuan suhu (default CELSIUS) */
@@ -57,6 +59,11 @@ class SettingsRepository(private val context: Context) {
         Triple(name, lat, lon)
     }
 
+    /** Menandakan apakah pengguna sudah pernah memilih/menyimpan kota */
+    val hasSavedCityFlow: Flow<Boolean> = context.settingsDataStore.data.map { pref ->
+        pref[KEY_HAS_SAVED_CITY] ?: false
+    }
+
     suspend fun setTempUnit(unit: TempUnit) {
         context.settingsDataStore.edit { pref ->
             pref[KEY_TEMP_UNIT] = unit.name
@@ -83,6 +90,7 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setLastCity(name: String, lat: Double, lon: Double) {
         context.settingsDataStore.edit { pref ->
+            pref[KEY_HAS_SAVED_CITY] = true
             pref[KEY_LAST_CITY_NAME] = name
             pref[KEY_LAST_LAT] = lat
             pref[KEY_LAST_LON] = lon

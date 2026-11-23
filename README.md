@@ -26,9 +26,13 @@ Aplikasi cuaca Android modern dan lengkap yang dibangun menggunakan **Jetpack Co
 - 📶 **Cache Offline**: Menyimpan respon cuaca terakhir ke DataStore. Saat offline, aplikasi secara otomatis menampilkan data cache disertai banner pemberitahuan status offline tanpa membuat aplikasi crash.
 - ✨ **Animasi Halus**: Transisi crossfade antar halaman dan animasi kemunculan elemen kartu dengan fade dan slide.
 
-### 📍 Tahap 3: Fitur Ekstra
-- 🛰️ **Lokasi GPS ("Gunakan Lokasi Saya")**: Menggunakan Google Play Services Location (`FusedLocationProviderClient`) untuk mengambil koordinat cuaca terkini pengguna secara akurat.
+### 📍 Tahap 3: Fitur Ekstra & Ketepatan Data
+- 🛰️ **Lokasi GPS Cerdas ("Gunakan Lokasi Saya")**: Menggunakan Google Play Services Location (`FusedLocationProviderClient.getCurrentLocation` + fallback `lastLocation`) dan Android `Geocoder` di thread background. Menangani semua skenario izin dan GPS mati secara komprehensif dengan Snackbar interaktif (tombol menuju Pengaturan Izin / Pengaturan Layanan Lokasi).
+- 🎯 **Akurasi Label Cuaca Berbasis Curah Hujan & Tutupan Awan**: Memadukan WMO weather code dengan nilai curah hujan (`precipitation`) dan tutupan awan (`cloud_cover`). Menghilangkan anomali label "Gerimis" saat langit hanya berawan tanpa hujan nyata (< 0.2 mm). Nilai curah hujan (mm) dan tutupan awan (%) ditampilkan transparan pada kartu utama dan kartu rincian.
+- 👋 **Banner Sambutan Pertama Kali**: Pengguna baru disambut dengan dialog/banner ramah untuk memilih lokasi GPS atau mencari kota, tanpa langsung memaksakan kota default tanpa penjelasan.
+- 🔍 **Pencarian Kota Bersih & Koordinat Transparan**: Menampilkan wilayah administratif (`admin1`), negara, serta menyaring duplikat hasil pencarian. Koordinat latitude dan longitude lokasi aktif ditampilkan rapi di bawah nama kota.
 - 🌐 **Dukungan Tiga Bahasa**: Dilengkapi terjemahan lengkap dalam **Bahasa Indonesia** (`values-in`), **English** (`values`), dan **Basa Jawa** (`values-jv`).
+- ℹ️ **Transparansi Sumber Data**: Label atribusi resmi *"Sumber: Open-Meteo (model prakiraan)"* pada layar Pengaturan.
 
 ---
 

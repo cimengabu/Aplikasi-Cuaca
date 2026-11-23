@@ -1,6 +1,7 @@
 package com.example.cuacaku.ui
 
 import android.app.Application
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -37,7 +38,7 @@ sealed interface WeatherUiState {
 }
 
 // =====================================================
-// WeatherViewModel — mengelola data cuaca, cache, & status favorit kota aktif
+// WeatherViewModel — mengelola data cuaca, cache, GPS, & status favorit kota aktif
 // =====================================================
 class WeatherViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -54,6 +55,10 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing
 
+    // Status pengambilan lokasi GPS
+    private val _isGpsLoading = MutableStateFlow(false)
+    val isGpsLoading: StateFlow<Boolean> = _isGpsLoading
+
     // Hasil pencarian kota
     private val _searchResults = MutableStateFlow<List<GeoResult>>(emptyList())
     val searchResults: StateFlow<List<GeoResult>> = _searchResults
@@ -62,12 +67,19 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
     private val _isFavorite = MutableStateFlow(false)
     val isFavorite: StateFlow<Boolean> = _isFavorite
 
-    // Nama & koordinat kota aktif
+    // Apakah pengguna sudah pernah memilih/menyimpan kota sendiri
+    val hasSavedCity: StateFlow<Boolean> = settingsRepo.hasSavedCityFlow.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        false
+    )
+
+    // Nama & koordinat kota aktif (menggunakan Compose state)
     var cityName = mutableStateOf("Jakarta")
         private set
-    var currentLat = -6.2146
+    var currentLat = mutableDoubleStateOf(-6.2146)
         private set
-    var currentLon = 106.8451
+    var currentLon = mutableDoubleStateOf(106.8451)
         private set
 
     // Satuan yang sedang aktif
@@ -86,8 +98,8 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
         // Ambil kota terakhir yang disimpan di lokal saat aplikasi dibuka
         viewModelScope.launch {
             val (savedName, savedLat, savedLon) = settingsRepo.lastCityFlow.first()
-            currentLat = savedLat
-            currentLon = savedLon
+            currentLat.doubleValue = savedLat
+            currentLon.doubleValue = savedLon
             cityName.value = savedName
             checkFavoriteStatus()
             refresh(silent = false)
@@ -108,11 +120,13 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
             _isRefreshing.value = true
 
             try {
-                val forecastData = repository.forecast(currentLat, currentLon)
-                val aqiData = repository.airQuality(currentLat, currentLon)
+                val lat = currentLat.doubleValue
+                val lon = currentLon.doubleValue
+                val forecastData = repository.forecast(lat, lon)
+                val aqiData = repository.airQuality(lat, lon)
 
                 // Simpan respon ke cache offline
-                weatherCache.saveCache(cityName.value, currentLat, currentLon, forecastData)
+                weatherCache.saveCache(cityName.value, lat, lon, forecastData)
 
                 val currentTimeStr = try {
                     LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
@@ -143,10 +157,10 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    /** Ganti kota aktif */
+    /** Ganti kota aktif (dipanggil saat cari kota atau GPS) */
     fun load(lat: Double, lon: Double, name: String) {
-        currentLat = lat
-        currentLon = lon
+        currentLat.doubleValue = lat
+        currentLon.doubleValue = lon
         cityName.value = name
         _searchResults.value = emptyList()
 
@@ -157,13 +171,17 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
         refresh(silent = false)
     }
 
+    fun setGpsLoading(loading: Boolean) {
+        _isGpsLoading.value = loading
+    }
+
     /** Toggle kota aktif ke / dari daftar favorit */
     fun toggleFavorite() {
         viewModelScope.launch {
             val city = FavoriteCity(
                 name = cityName.value,
-                lat = currentLat,
-                lon = currentLon
+                lat = currentLat.doubleValue,
+                lon = currentLon.doubleValue
             )
             if (_isFavorite.value) {
                 favoritesRepo.removeFavorite(city)
@@ -176,7 +194,7 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private suspend fun checkFavoriteStatus() {
-        _isFavorite.value = favoritesRepo.isFavorite(currentLat, currentLon)
+        _isFavorite.value = favoritesRepo.isFavorite(currentLat.doubleValue, currentLon.doubleValue)
     }
 
     /** Cari kota */

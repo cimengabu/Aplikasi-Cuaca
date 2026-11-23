@@ -4,6 +4,7 @@ import com.example.cuacaku.data.remote.AirQualityResponse
 import com.example.cuacaku.data.remote.GeoResult
 import com.example.cuacaku.data.remote.NetworkModule
 import com.example.cuacaku.data.remote.WeatherResponse
+import java.util.Locale
 
 // =====================================================
 // Repository — penghubung antara API remote dan ViewModel
@@ -29,12 +30,17 @@ class WeatherRepository {
 
     /**
      * Mencari kota berdasarkan kata kunci.
-     * Mengembalikan list kosong jika tidak ada hasil.
+     * Mengembalikan list tanpa duplikat (nama dan koordinat yang sama).
      */
     suspend fun searchCity(query: String, lang: String): List<GeoResult> {
         return try {
             val response = NetworkModule.geocodingApi.search(name = query, language = lang)
-            response.results ?: emptyList()
+            val raw = response.results ?: emptyList()
+            raw.distinctBy {
+                val latRounded = String.format(Locale.US, "%.2f", it.latitude)
+                val lonRounded = String.format(Locale.US, "%.2f", it.longitude)
+                "${it.name.trim().lowercase()}_${it.country?.trim()?.lowercase()}_${latRounded}_${lonRounded}"
+            }
         } catch (_: Exception) {
             emptyList()
         }

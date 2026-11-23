@@ -23,12 +23,13 @@ import androidx.compose.ui.unit.sp
 import com.example.cuacaku.data.remote.Hourly
 import com.example.cuacaku.util.TempUnit
 import com.example.cuacaku.util.UnitConverter
-import com.example.cuacaku.util.weatherLabel
+import com.example.cuacaku.util.resolveHourlyWeather
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 // =====================================================
 // HourlyRow — Scroll horizontal per jam untuk 24 jam ke depan
+// Menggunakan resolusi cuaca akurat berbasis curah hujan & awan
 // =====================================================
 @Composable
 fun HourlyRow(
@@ -63,7 +64,15 @@ fun HourlyRow(
 
             // Tentukan apakah jam tersebut siang atau malam (06:00 - 18:00)
             val isDay = parsedTime?.let { it.hour in 6..18 } ?: true
-            val (_, emoji) = weatherLabel(hourly.weatherCode[i], isDay)
+
+            // Gunakan resolveHourlyWeather agar label & emoji akurat
+            val resolved = resolveHourlyWeather(
+                code = hourly.weatherCode[i],
+                precipitation = hourly.precipitation?.getOrNull(i),
+                cloudCover = hourly.cloudCover?.getOrNull(i),
+                isDay = isDay
+            )
+
             val tempFormatted = UnitConverter.formatTemperature(hourly.temperature[i], tempUnit)
 
             Card(
@@ -80,7 +89,7 @@ fun HourlyRow(
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     )
                     Spacer(Modifier.height(6.dp))
-                    Text(text = emoji, fontSize = 24.sp)
+                    Text(text = resolved.emoji, fontSize = 24.sp)
                     Spacer(Modifier.height(6.dp))
                     Text(
                         text = tempFormatted,

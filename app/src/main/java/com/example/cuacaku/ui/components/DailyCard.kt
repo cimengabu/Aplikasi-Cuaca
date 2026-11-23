@@ -21,13 +21,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cuacaku.util.TempUnit
 import com.example.cuacaku.util.UnitConverter
-import com.example.cuacaku.util.weatherLabel
+import com.example.cuacaku.util.resolveDailyWeather
 import java.time.LocalDate
 import java.time.format.TextStyle as JavaTextStyle
 import java.util.Locale
 
 // =====================================================
 // DailyCard — Kartu prakiraan harian (bisa diklik untuk membuka bottom sheet)
+// Menggunakan resolusi cuaca harian akurat berdasarkan peluang & curah hujan
 // =====================================================
 @Composable
 fun DailyCard(
@@ -36,11 +37,16 @@ fun DailyCard(
     maxTemp: Double,
     minTemp: Double,
     rain: Int?,
+    precipitationSum: Double?,
     tempUnit: TempUnit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val (labelRes, emoji) = weatherLabel(weatherCode, isDay = true)
+    val resolved = resolveDailyWeather(
+        code = weatherCode,
+        rainProb = rain,
+        precipitationSum = precipitationSum
+    )
 
     val formattedDate = try {
         val date = LocalDate.parse(dateStr)
@@ -68,7 +74,7 @@ fun DailyCard(
                 .padding(horizontal = 16.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = emoji, fontSize = 34.sp)
+            Text(text = resolved.emoji, fontSize = 34.sp)
             Spacer(Modifier.width(14.dp))
 
             Column(modifier = Modifier.weight(1f)) {
@@ -79,7 +85,7 @@ fun DailyCard(
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = stringResource(labelRes),
+                    text = stringResource(resolved.labelRes),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f)
                 )

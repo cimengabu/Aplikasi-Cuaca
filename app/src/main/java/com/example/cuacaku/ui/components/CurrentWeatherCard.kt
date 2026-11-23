@@ -31,16 +31,21 @@ import androidx.compose.ui.unit.sp
 import com.example.cuacaku.R
 import com.example.cuacaku.util.TempUnit
 import com.example.cuacaku.util.UnitConverter
-import com.example.cuacaku.util.weatherLabel
+import com.example.cuacaku.util.resolveCurrentWeather
+import java.util.Locale
 
 // =====================================================
-// CurrentWeatherCard — Kartu cuaca utama dengan gradasi dinamis
+// CurrentWeatherCard — Kartu cuaca utama dengan label akurat & koordinat
 // =====================================================
 @Composable
 fun CurrentWeatherCard(
     cityName: String,
+    latitude: Double,
+    longitude: Double,
     temperature: Double,
     weatherCode: Int,
+    precipitation: Double,
+    cloudCover: Int,
     isDay: Boolean,
     tempUnit: TempUnit,
     isFavorite: Boolean,
@@ -49,42 +54,48 @@ fun CurrentWeatherCard(
     isOffline: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val (labelRes, emoji) = weatherLabel(weatherCode, isDay)
+    // Penentuan label cuaca akurat berbasis weather_code, precipitation, dan cloud_cover
+    val resolved = resolveCurrentWeather(
+        code = weatherCode,
+        precipitation = precipitation,
+        cloudCover = cloudCover,
+        isDay = isDay
+    )
+
     val isDark = isSystemInDarkTheme()
 
-    // Gradasi dinamis berdasarkan kode cuaca, kondisi siang/malam, dan tema
+    // Gradasi dinamis berdasarkan kondisi cuaca hasil resolusi
     val gradientColors = when {
         // Cerah siang
-        isDay && weatherCode == 0 -> {
+        isDay && resolved.effectiveCode == 0 -> {
             if (isDark) listOf(Color(0xFF1565C0), Color(0xFF0D47A1))
             else listOf(Color(0xFF42A5F5), Color(0xFF1976D2))
         }
         // Cerah malam
-        !isDay && weatherCode == 0 -> {
+        !isDay && resolved.effectiveCode == 0 -> {
             if (isDark) listOf(Color(0xFF1A237E), Color(0xFF0B1038))
             else listOf(Color(0xFF283593), Color(0xFF1A237E))
         }
-        // Berawan (siang / malam)
-        weatherCode in 1..3 -> {
+        // Berawan sebagian / Berawan
+        resolved.effectiveCode in 1..3 -> {
             if (isDark) listOf(Color(0xFF37474F), Color(0xFF212121))
             else listOf(Color(0xFF607D8B), Color(0xFF455A64))
         }
         // Hujan & Badai
-        weatherCode in listOf(51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 95, 96, 99) -> {
+        resolved.effectiveCode in listOf(51, 61, 65, 95) -> {
             if (isDark) listOf(Color(0xFF263238), Color(0xFF102027))
             else listOf(Color(0xFF455A64), Color(0xFF263238))
         }
         // Salju
-        weatherCode in listOf(71, 73, 75, 77, 85, 86) -> {
+        resolved.effectiveCode == 71 -> {
             if (isDark) listOf(Color(0xFF3949AB), Color(0xFF1A237E))
             else listOf(Color(0xFF64B5F6), Color(0xFF1E88E5))
         }
         // Berkabut
-        weatherCode in listOf(45, 48) -> {
+        resolved.effectiveCode == 45 -> {
             if (isDark) listOf(Color(0xFF424242), Color(0xFF212121))
             else listOf(Color(0xFF78909C), Color(0xFF546E7A))
         }
-        // Default
         else -> {
             if (isDark) listOf(Color(0xFF1A3A5C), Color(0xFF0E1E30))
             else listOf(Color(0xFF42A5F5), Color(0xFF1976D2))
@@ -98,7 +109,7 @@ fun CurrentWeatherCard(
             .fillMaxWidth()
             .clip(RoundedCornerShape(28.dp))
             .background(gradient)
-            .padding(vertical = 28.dp, horizontal = 20.dp)
+            .padding(vertical = 24.dp, horizontal = 20.dp)
     ) {
         // Tombol Favorite bintang di pojok kanan atas
         IconButton(
@@ -118,41 +129,66 @@ fun CurrentWeatherCard(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Nama kota
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = cityName,
-                    color = Color.White,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+            Text(
+                text = cityName,
+                color = Color.White,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+
+            // Koordinat geografis kecil (Masalah 2d)
+            val coordText = String.format(Locale.US, "📍 %.2f, %.2f", latitude, longitude)
+            Text(
+                text = coordText,
+                color = Color.White.copy(alpha = 0.8f),
+                style = MaterialTheme.typography.labelSmall
+            )
+
             Spacer(Modifier.height(8.dp))
 
-            // Emoji cuaca besar
-            Text(text = emoji, fontSize = 72.sp)
+            // Emoji cuaca akurat
+            Text(text = resolved.emoji, fontSize = 68.sp)
             Spacer(Modifier.height(4.dp))
 
-            // Suhu saat ini sesuai unit yang dipilih
+            // Suhu saat ini
             val tempFormatted = UnitConverter.formatTemperature(temperature, tempUnit)
             Text(
                 text = tempFormatted,
                 color = Color.White,
-                fontSize = 54.sp,
+                fontSize = 52.sp,
                 fontWeight = FontWeight.Bold
             )
             Spacer(Modifier.height(4.dp))
 
-            // Label kondisi cuaca
+            // Label kondisi cuaca akurat
             Text(
-                text = stringResource(labelRes),
-                color = Color.White.copy(alpha = 0.9f),
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Medium
+                text = stringResource(resolved.labelRes),
+                color = Color.White.copy(alpha = 0.95f),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
             )
+
+            Spacer(Modifier.height(8.dp))
+
+            // Nilai curah hujan (mm) & tutupan awan (%) agar jelas bagi pengguna & guru (Masalah 1)
+            val precipStr = String.format(Locale.US, "%.1f", precipitation)
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color.Black.copy(alpha = 0.2f))
+                    .padding(horizontal = 12.dp, vertical = 6.dp)
+            ) {
+                Text(
+                    text = "${stringResource(R.string.precipitation_val, precipStr)}  •  ${stringResource(R.string.cloud_cover_val, cloudCover)}",
+                    color = Color.White.copy(alpha = 0.9f),
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Medium
+                )
+            }
 
             // Info terakhir diperbarui / status offline
             if (lastUpdatedTime.isNotEmpty() && !isOffline) {
-                Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(8.dp))
                 Text(
                     text = stringResource(R.string.last_updated, lastUpdatedTime),
                     color = Color.White.copy(alpha = 0.75f),

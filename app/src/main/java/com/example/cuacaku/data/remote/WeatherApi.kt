@@ -13,8 +13,8 @@ interface WeatherApi {
     suspend fun getForecast(
         @Query("latitude") latitude: Double,
         @Query("longitude") longitude: Double,
-        @Query("current") current: String = "temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code,is_day,pressure_msl,cloud_cover,wind_direction_10m,visibility",
-        @Query("hourly") hourly: String = "temperature_2m,weather_code",
+        @Query("current") current: String = "temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code,is_day,pressure_msl,cloud_cover,wind_direction_10m,visibility,precipitation,rain",
+        @Query("hourly") hourly: String = "temperature_2m,weather_code,precipitation,precipitation_probability,cloud_cover",
         @Query("daily") daily: String = "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset,uv_index_max,precipitation_sum",
         @Query("timezone") timezone: String = "auto",
         @Query("forecast_days") forecastDays: Int = 7
@@ -28,7 +28,7 @@ interface GeocodingApi {
     @GET("v1/search")
     suspend fun search(
         @Query("name") name: String,
-        @Query("count") count: Int = 5,
+        @Query("count") count: Int = 10,
         @Query("language") language: String = "en"
     ): GeocodingResponse
 }

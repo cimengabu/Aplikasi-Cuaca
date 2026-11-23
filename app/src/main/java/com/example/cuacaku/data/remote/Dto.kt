@@ -35,7 +35,11 @@ data class Current(
     @SerializedName("wind_direction_10m")
     val windDirection: Double = 0.0,
     @SerializedName("visibility")
-    val visibility: Double = 10000.0
+    val visibility: Double = 10000.0,
+    @SerializedName("precipitation")
+    val precipitation: Double = 0.0,
+    @SerializedName("rain")
+    val rain: Double = 0.0
 )
 
 /** Data prakiraan per jam */
@@ -44,7 +48,13 @@ data class Hourly(
     @SerializedName("temperature_2m")
     val temperature: List<Double>,
     @SerializedName("weather_code")
-    val weatherCode: List<Int>
+    val weatherCode: List<Int>,
+    @SerializedName("precipitation")
+    val precipitation: List<Double>? = null,
+    @SerializedName("precipitation_probability")
+    val precipitationProbability: List<Int>? = null,
+    @SerializedName("cloud_cover")
+    val cloudCover: List<Int>? = null
 )
 
 /** Data prakiraan harian (7 hari) */

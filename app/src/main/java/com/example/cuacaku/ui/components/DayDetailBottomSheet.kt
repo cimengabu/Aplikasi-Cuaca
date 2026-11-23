@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.sp
 import com.example.cuacaku.R
 import com.example.cuacaku.util.TempUnit
 import com.example.cuacaku.util.UnitConverter
-import com.example.cuacaku.util.weatherLabel
+import com.example.cuacaku.util.resolveDailyWeather
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -57,7 +57,11 @@ fun DayDetailBottomSheet(
     sheetState: SheetState,
     onDismiss: () -> Unit
 ) {
-    val (labelRes, emoji) = weatherLabel(data.weatherCode, isDay = true)
+    val resolved = resolveDailyWeather(
+        code = data.weatherCode,
+        rainProb = data.rainProb,
+        precipitationSum = data.precipitationSum
+    )
 
     val formattedDate = try {
         val date = LocalDate.parse(data.dateStr)
@@ -102,11 +106,11 @@ fun DayDetailBottomSheet(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = emoji, fontSize = 54.sp)
+                Text(text = resolved.emoji, fontSize = 54.sp)
                 Spacer(Modifier.width(16.dp))
                 Column {
                     Text(
-                        text = stringResource(labelRes),
+                        text = stringResource(resolved.labelRes),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -138,14 +142,14 @@ fun DayDetailBottomSheet(
                 DetailRow(
                     emoji = "💧",
                     label = stringResource(R.string.precipitation_sum),
-                    value = "${data.precipitationSum?.let { String.format("%.1f", it) } ?: "0.0"} mm"
+                    value = "${data.precipitationSum?.let { String.format(Locale.US, "%.1f", it) } ?: "0.0"} mm"
                 )
 
                 // Indeks UV Maksimum
                 DetailRow(
                     emoji = "☀️",
                     label = stringResource(R.string.uv_index),
-                    value = data.uvIndexMax?.let { String.format("%.1f", it) } ?: "-"
+                    value = data.uvIndexMax?.let { String.format(Locale.US, "%.1f", it) } ?: "-"
                 )
 
                 // Matahari Terbit

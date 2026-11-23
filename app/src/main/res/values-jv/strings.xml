@@ -11,7 +11,14 @@
     <string name="search_city">Pados kitha</string>
     <string name="search">Pados</string>
     <string name="use_my_location">Ngunakaken lokasi kula</string>
-    <string name="location_permission_denied">Izin lokasi dipuntolak</string>
+    <string name="location_permission_denied">Izin lokasi dipuntolak.</string>
+    <string name="location_permission_permanently_denied">Izin lokasi dipunnonaktifaken. Monggo keparengaken ing Setelan Aplikasi.</string>
+    <string name="location_services_disabled">Layanan lokasi mati. Monggo aktifaken GPS.</string>
+    <string name="open_location_settings">Aktifaken GPS</string>
+    <string name="open_app_settings">Setelan</string>
+    <string name="location_not_found">Lokasi mboten kepanggih. Cobi malih.</string>
+    <string name="location_detected">Lokasi dipunsetel dhateng %1$s</string>
+    <string name="gps_fetching">Saweg mendhet lokasi…</string>
     <string name="my_location">Lokasi Kula</string>
     <string name="last_updated">Paling akhir dianyari: %1$s</string>
     <string name="offline_banner">Mode offline, data pungkasan dianyari: %1$s</string>
@@ -19,6 +26,11 @@
     <string name="remove_from_favorites">Busak saking favorit</string>
     <string name="added_to_favorites">Ditambahaken dhateng favorit</string>
     <string name="removed_from_favorites">Dibusak saking favorit</string>
+
+    <!-- First Launch Welcome Banner -->
+    <string name="welcome_title">Sugeng Rawuh ing CuacaKu</string>
+    <string name="welcome_desc">Gunakaken lokasi sakmenika ngangge GPS utawi pados kitha kagem mirsani prakiraan cuaca ingkang trep.</string>
+    <string name="welcome_use_gps">Ngunakaken Lokasi Kula</string>
 
     <!-- Weather Stats & Titles -->
     <string name="humidity">Kelembapan</string>
@@ -35,7 +47,10 @@
     <string name="uv_index">Indeks UV</string>
     <string name="sunrise">Srengenge Plethek</string>
     <string name="sunset">Srengenge Surup</string>
+    <string name="precipitation_label">Curah Udan</string>
     <string name="precipitation_sum">Curah Udan</string>
+    <string name="precipitation_val">Curah udan: %1$s mm</string>
+    <string name="cloud_cover_val">Mendhung: %1$d%%</string>
     <string name="rain_probability">Peluang Udan</string>
     <string name="error_network">Gagal mendhet data. Priksa sambungan internet sampeyan.</string>
     <string name="retry">Cobi malih</string>
@@ -106,6 +121,7 @@
     <string name="app_version">Versi</string>
     <string name="data_source">Sumber Data</string>
     <string name="data_source_value">Open-Meteo (API Cuaca Gratis &amp; Bikak)</string>
+    <string name="data_source_forecast_model">Sumber: Open-Meteo (model prakiraan)</string>
 
     <!-- Weather Codes -->
     <string name="w_clear">Padhang</string>
@@ -115,6 +131,7 @@
     <string name="w_fog">Pedhut</string>
     <string name="w_drizzle">Grimis</string>
     <string name="w_rain">Udan</string>
+    <string name="w_heavy_rain">Udan deres</string>
     <string name="w_snow">Salju</string>
     <string name="w_thunder">Prahara bledheg</string>
     <string name="w_unknown">Mboten mangertos</string>
