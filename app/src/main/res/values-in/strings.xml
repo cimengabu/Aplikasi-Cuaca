@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CuacaKu</string>
+    <string name="search_city">Cari kota</string>
+    <string name="search">Cari</string>
+    <string name="humidity">Kelembapan</string>
+    <string name="wind">Angin</string>
+    <string name="feels_like">Terasa</string>
+    <string name="hourly_title">24 jam ke depan</string>
+    <string name="daily_title">Prakiraan 7 hari</string>
+    <string name="error_network">Gagal memuat data. Periksa koneksi internetmu.</string>
+    <string name="retry">Coba lagi</string>
+    <string name="choose_language">Pilih bahasa</string>
+    <string name="close">Tutup</string>
+    <string name="w_clear">Cerah</string>
+    <string name="w_partly">Berawan sebagian</string>
+    <string name="w_cloudy">Berawan</string>
+    <string name="w_fog">Berkabut</string>
+    <string name="w_drizzle">Gerimis</string>
+    <string name="w_rain">Hujan</string>
+    <string name="w_snow">Salju</string>
+    <string name="w_thunder">Badai petir</string>
+    <string name="w_unknown">Tidak diketahui</string>
+</resources>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CuacaKu</string>
+    <string name="search_city">Search city</string>
+    <string name="search">Search</string>
+    <string name="humidity">Humidity</string>
+    <string name="wind">Wind</string>
+    <string name="feels_like">Feels like</string>
+    <string name="hourly_title">Next 24 hours</string>
+    <string name="daily_title">7-day forecast</string>
+    <string name="error_network">Failed to load data. Check your internet connection.</string>
+    <string name="retry">Retry</string>
+    <string name="choose_language">Choose language</string>
+    <string name="close">Close</string>
+    <string name="w_clear">Clear</string>
+    <string name="w_partly">Partly cloudy</string>
+    <string name="w_cloudy">Cloudy</string>
+    <string name="w_fog">Fog</string>
+    <string name="w_drizzle">Drizzle</string>
+    <string name="w_rain">Rain</string>
+    <string name="w_snow">Snow</string>
+    <string name="w_thunder">Thunderstorm</string>
+    <string name="w_unknown">Unknown</string>
+</resources>
