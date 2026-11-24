@@ -18,7 +18,12 @@ Aplikasi cuaca Android modern dan lengkap yang dibangun menggunakan **Jetpack Co
 - 🔄 **Pull to Refresh**: Tarik ke bawah di Beranda untuk memuat ulang data dengan animasi indikator modern Material 3, dilengkapi label status *"Terakhir diperbarui"*.
 - 🎨 **Latar Belakang Dinamis**: Warna gradasi kartu cuaca utama berubah otomatis mengikuti kondisi cuaca (cerah, berawan, hujan, badai, salju, kabut) serta mendeteksi waktu siang atau malam (☀️ / 🌙).
 
-### 🚀 Tahap 2: Fitur Unggulan Dashboard
+### 🚀 Tahap 2: Fitur Unggulan Dashboard & Tampilan ala Xiaomi / HyperOS
+- 📱 **Desain Dashboard Modern Translucent (HyperOS Style)**:
+  - **Hero Temperature Section**: Angka temperatur besar yang mengambang bebas di atas latar belakang cuaca bergerak tanpa terkurung kotak kaku, dilengkapi subtitle elegan satu baris (`Kondisi  Min° / Max°  Kualitas udara: Skor - Status`).
+  - **Kartu Kualitas Udara (Circular Gauge)**: Menampilkan kategori AQI (Moderate, Baik, dsb.) di sebelah kiri dan instrumen busur lingkaran skor AQI di sebelah kanan persis seperti di aplikasi cuaca bawaan ponsel.
+  - **Prakiraan Per Jam Terpadu**: Scroll horizontal 24 jam dalam satu kartu kaca transparan (*frosted glass*) dengan penanda *"Sekarang"*, ikon cuaca, dan suhu.
+  - **Prakiraan Multi-Hari dengan Kurva Garis & Toggle Garis/Daftar**: Memilih mode grafik kurva suhu halus antar-hari atau mode daftar vertikal.
 - 📈 **Grafik Tren Suhu 24 Jam (Canvas)**: Kurva temperatur halus yang digambar manual menggunakan Android Canvas (tanpa library eksternal) dengan titik data, label suhu, dan area gradasi transparan di bawah garis, dapat digeser secara horizontal.
 - 🍃 **Kualitas Udara (AQI)**: Mengambil data indeks kualitas udara dari Open-Meteo Air Quality API, menampilkan angka AQI, kategori berskala warna standar US EPA (Baik, Sedang, dsb.), bar indikator level, dan konsentrasi polutan PM2.5 & PM10.
 - 📋 **Detail Hari (Modal Bottom Sheet)**: Klik pada salah satu kartu prakiraan harian untuk membuka sheet interaktif berisi rincian lengkap hari tersebut (probabilitas hujan, total curah hujan mm, indeks UV max, sunrise/sunset).
