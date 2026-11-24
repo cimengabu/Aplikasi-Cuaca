@@ -95,6 +95,9 @@ import com.example.cuacaku.ui.components.DailyForecastCard
 import com.example.cuacaku.ui.components.DayDetailBottomSheet
 import com.example.cuacaku.ui.components.HourlyRow
 import com.example.cuacaku.ui.components.HourlyTemperatureChart
+import com.example.cuacaku.ui.components.FeelsLikeDetailCard
+import com.example.cuacaku.ui.components.HourlyPrecipitationChart
+import com.example.cuacaku.ui.components.HumidityWindChart
 import com.example.cuacaku.ui.components.LifestyleIndicesCard
 import com.example.cuacaku.ui.components.NowcastingCard
 import com.example.cuacaku.ui.components.PollutantsBottomSheet
@@ -105,6 +108,8 @@ import com.example.cuacaku.ui.components.SunMoonEphemerisCard
 import com.example.cuacaku.ui.components.WeatherAnimatedBackground
 import com.example.cuacaku.ui.components.WeatherDetailsCard
 import com.example.cuacaku.ui.components.WeatherTipsCard
+import com.example.cuacaku.ui.components.WeeklyOverviewCard
+import com.example.cuacaku.ui.components.WindCompassCard
 import com.example.cuacaku.ui.components.detectSevereWeather
 import com.example.cuacaku.util.AqiHelper
 import com.example.cuacaku.util.ShareWeatherHelper
@@ -772,6 +777,47 @@ fun HomeScreen(
                                 feelsLike = data.current.feelsLike,
                                 tempUnit = tempUnit,
                                 windUnit = windUnit
+                            )
+                        }
+
+                        // 12b. Kompas Angin Animasi
+                        item {
+                            WindCompassCard(
+                                windSpeed = data.current.windSpeed,
+                                windDirection = data.current.windDirection,
+                                windUnit = windUnit
+                            )
+                        }
+
+                        // 12c. Kelembapan & Titik Embun
+                        item {
+                            HumidityWindChart(
+                                humidity = data.current.humidity,
+                                feelsLike = data.current.feelsLike,
+                                temperature = data.current.temperature
+                            )
+                        }
+
+                        // 12d. Sensasi Suhu Detail
+                        item {
+                            FeelsLikeDetailCard(
+                                temperature = data.current.temperature,
+                                feelsLike = data.current.feelsLike,
+                                humidity = data.current.humidity,
+                                windSpeed = data.current.windSpeed
+                            )
+                        }
+
+                        // 12e. Bar Chart Curah Hujan Per Jam
+                        item {
+                            HourlyPrecipitationChart(hourly = data.hourly)
+                        }
+
+                        // 12f. Ringkasan Mingguan
+                        item {
+                            WeeklyOverviewCard(
+                                daily = data.daily,
+                                tempUnit = tempUnit
                             )
                         }
 
