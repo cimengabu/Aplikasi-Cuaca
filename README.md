@@ -13,7 +13,7 @@ Aplikasi cuaca Android modern, estetis, dan lengkap yang dibangun menggunakan **
   - Satuan suhu: **Celsius (°C)** / **Fahrenheit (°F)**
   - Satuan kecepatan angin: **km/h** / **mph**
   - Tema tampilan: **Ikuti Sistem**, **Terang**, atau **Gelap** (langsung berlaku secara dinamis)
-  - Pilihan Bahasa: **Bahasa Indonesia**, **English**, dan **Basa Jawa**
+  - Pilihan Bahasa: **14 Bahasa** (Bahasa Indonesia, English, Basa Jawa, Basa Sunda, Bahasa Melayu, Español, Français, Deutsch, 日本語, 简体中文, العربية, Русский, 한국어, Português)
 - 📊 **Detail Cuaca Tambahan**: Tekanan udara (hPa), Tutupan awan (%), Arah angin (dengan teks mata angin), Jarak pandang (km), Indeks UV maksimum (dengan lencana kategori & warna), serta waktu Matahari Terbit & Terbenam.
 - 🔄 **Pull to Refresh**: Tarik ke bawah di Beranda untuk memuat ulang data dengan animasi indikator modern Material 3, dilengkapi label status *"Terakhir diperbarui"*.
 - 🎨 **Latar Belakang Dinamis**: Background animasi cuaca interaktif dengan partikel hujan/awan/matahari yang hidup mengikuti kondisi cuaca aktual.
@@ -37,7 +37,7 @@ Aplikasi cuaca Android modern, estetis, dan lengkap yang dibangun menggunakan **
 - ⏱️ **Prediksi Menit ke Depan (Nowcasting Card)**: Menggunakan Open-Meteo `minutely_15` API untuk mendeteksi kapan hujan mulai atau reda dalam rentang 15–60 menit ke depan, lengkap dengan timeline blok interval 15 menit.
 - 👋 **Banner Sambutan Pertama Kali**: Pengguna baru disambut dengan dialog/banner ramah untuk memilih lokasi GPS atau mencari kota, tanpa langsung memaksakan kota default tanpa penjelasan.
 - 🔍 **Pencarian Kota Bersih & Koordinat Transparan**: Menampilkan wilayah administratif (`admin1`), negara, serta menyaring duplikat hasil pencarian. Koordinat latitude dan longitude lokasi aktif ditampilkan rapi di bawah nama kota.
-- 🌐 **Dukungan Tiga Bahasa**: Dilengkapi terjemahan lengkap dalam **Bahasa Indonesia** (`values-in`), **English** (`values`), dan **Basa Jawa** (`values-jv`).
+- 🌐 **Dukungan 14 Bahasa Global & Daerah**: Dilengkapi terjemahan lengkap dan akurat dalam 14 bahasa: **Bahasa Indonesia** (`values-in`), **English** (`values`), **Basa Jawa** (`values-jv`), **Basa Sunda** (`values-su`), **Bahasa Melayu** (`values-ms`), **Español** (`values-es`), **Français** (`values-fr`), **Deutsch** (`values-de`), **日本語** (`values-ja`), **简体中文** (`values-zh`), **العربية** (`values-ar`), **Русский** (`values-ru`), **한국어** (`values-ko`), dan **Português** (`values-pt`).
 - ℹ️ **Transparansi Sumber Data**: Label atribusi resmi *"Sumber: Open-Meteo (model prakiraan)"* pada layar Pengaturan.
 
 ---
@@ -53,7 +53,7 @@ Aplikasi cuaca Android modern, estetis, dan lengkap yang dibangun menggunakan **
 | **Networking** | Retrofit 2 + Gson Converter + Coroutines |
 | **Lokasi** | Google Play Services Location |
 | **Grafik** | Custom Canvas Drawing (Cubic Bezier Curve) |
-| **Multi Bahasa** | Android String Resources (`values`, `values-in`, `values-jv`) + `AppCompatDelegate.setApplicationLocales` |
+| **Multi Bahasa** | 14 Bahasa (`values`, `values-in`, `values-jv`, `values-su`, `values-ms`, `values-es`, `values-fr`, `values-de`, `values-ja`, `values-zh`, `values-ar`, `values-ru`, `values-ko`, `values-pt`) + `AppCompatDelegate.setApplicationLocales` |
 | **Mode Tema** | Material 3 Color Schemes + `AppCompatDelegate.setDefaultNightMode` |
 
 ---

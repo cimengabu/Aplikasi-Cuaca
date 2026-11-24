@@ -33,6 +33,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.cuacaku.R
 import com.example.cuacaku.ui.SettingsViewModel
 import com.example.cuacaku.ui.components.LanguageDialog
+import com.example.cuacaku.ui.components.getLanguageDisplayName
 import com.example.cuacaku.util.TempUnit
 import com.example.cuacaku.util.WindUnit
 
@@ -55,6 +56,7 @@ fun SettingsScreen(
 
     if (showLanguageDialog) {
         LanguageDialog(
+            currentLanguage = language,
             onDismiss = { showLanguageDialog = false },
             onSelect = { langTag ->
                 showLanguageDialog = false
@@ -248,11 +250,7 @@ fun SettingsScreen(
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
-                            val currentLangName = when (language) {
-                                "en" -> "🇬🇧  English"
-                                "jv" -> "🇮🇩  Basa Jawa"
-                                else -> "🇮🇩  Bahasa Indonesia"
-                            }
+                            val currentLangName = getLanguageDisplayName(language)
                             Text(
                                 text = currentLangName,
                                 style = MaterialTheme.typography.bodyMedium,
