@@ -35,7 +35,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -46,6 +50,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -85,6 +90,7 @@ import com.example.cuacaku.ui.components.AirQualityCard
 import com.example.cuacaku.ui.components.CityResultItem
 import com.example.cuacaku.ui.components.CurrentWeatherCard
 import com.example.cuacaku.ui.components.DailyCard
+import com.example.cuacaku.ui.components.DailyForecastCard
 import com.example.cuacaku.ui.components.DayDetailBottomSheet
 import com.example.cuacaku.ui.components.HourlyRow
 import com.example.cuacaku.ui.components.HourlyTemperatureChart
@@ -94,6 +100,7 @@ import com.example.cuacaku.ui.components.StatsRow
 import com.example.cuacaku.ui.components.WeatherAnimatedBackground
 import com.example.cuacaku.ui.components.WeatherDetailsCard
 import com.example.cuacaku.ui.components.WeatherTipsCard
+import com.example.cuacaku.util.AqiHelper
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
@@ -132,6 +139,7 @@ fun HomeScreen(
 
     // Teks pencarian disimpan dengan rememberSaveable
     var searchQuery by rememberSaveable { mutableStateOf("") }
+    var isSearchOpen by rememberSaveable { mutableStateOf(false) }
 
     // Bottom sheet detail hari
     var selectedDay by remember { mutableStateOf<SelectedDayData?>(null) }
@@ -286,62 +294,111 @@ fun HomeScreen(
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // 1. Header: Judul & Tombol Lokasi GPS
+                    // 1. Header: Nama Kota (kiri) & Aksi Cepat (kanan, persis Xiaomi / HyperOS)
                     item {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(
-                                text = stringResource(R.string.app_name),
-                                style = MaterialTheme.typography.headlineMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
-                            )
-
-                            // Tombol Lokasi GPS dengan Indikator Loading
-                            if (isGpsLoading) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier
-                                        .padding(8.dp)
-                                        .size(24.dp),
-                                    strokeWidth = 2.5.dp,
-                                    color = Color.White
+                            Column {
+                                Text(
+                                    text = cityName,
+                                    style = MaterialTheme.typography.headlineMedium.copy(
+                                        fontSize = 30.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White
+                                    )
                                 )
-                            } else {
-                                IconButton(
-                                    onClick = {
-                                    val hasFine = ContextCompat.checkSelfPermission(
-                                        context,
-                                        Manifest.permission.ACCESS_FINE_LOCATION
-                                    ) == PackageManager.PERMISSION_GRANTED
-                                    val hasCoarse = ContextCompat.checkSelfPermission(
-                                        context,
-                                        Manifest.permission.ACCESS_COARSE_LOCATION
-                                    ) == PackageManager.PERMISSION_GRANTED
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                    modifier = Modifier.padding(top = 2.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.LocationOn,
+                                        contentDescription = null,
+                                        tint = Color.White.copy(alpha = 0.85f),
+                                        modifier = Modifier.size(15.dp)
+                                    )
+                                    Text(
+                                        text = String.format(Locale.US, "%.2f, %.2f", viewModel.currentLat.doubleValue, viewModel.currentLon.doubleValue),
+                                        style = MaterialTheme.typography.bodySmall.copy(
+                                            color = Color.White.copy(alpha = 0.8f),
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    )
+                                }
+                            }
 
-                                    if (hasFine || hasCoarse) {
-                                        triggerGpsFlow()
-                                    } else {
-                                        locationLauncher.launch(
-                                            arrayOf(
-                                                Manifest.permission.ACCESS_FINE_LOCATION,
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(2.dp)
+                            ) {
+                                // Tombol Buka/Tutup Pencarian Kota
+                                IconButton(onClick = { isSearchOpen = !isSearchOpen }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Search,
+                                        contentDescription = stringResource(R.string.search_city),
+                                        tint = Color.White,
+                                        modifier = Modifier.size(26.dp)
+                                    )
+                                }
+
+                                // Tombol Lokasi GPS
+                                if (isGpsLoading) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier
+                                            .padding(8.dp)
+                                            .size(22.dp),
+                                        strokeWidth = 2.5.dp,
+                                        color = Color.White
+                                    )
+                                } else {
+                                    IconButton(
+                                        onClick = {
+                                            val hasFine = ContextCompat.checkSelfPermission(
+                                                context,
+                                                Manifest.permission.ACCESS_FINE_LOCATION
+                                            ) == PackageManager.PERMISSION_GRANTED
+                                            val hasCoarse = ContextCompat.checkSelfPermission(
+                                                context,
                                                 Manifest.permission.ACCESS_COARSE_LOCATION
-                                            )
+                                            ) == PackageManager.PERMISSION_GRANTED
+
+                                            if (hasFine || hasCoarse) {
+                                                triggerGpsFlow()
+                                            } else {
+                                                locationLauncher.launch(
+                                                    arrayOf(
+                                                        Manifest.permission.ACCESS_FINE_LOCATION,
+                                                        Manifest.permission.ACCESS_COARSE_LOCATION
+                                                    )
+                                                )
+                                            }
+                                        }
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.MyLocation,
+                                            contentDescription = stringResource(R.string.use_my_location),
+                                            tint = Color.White,
+                                            modifier = Modifier.size(24.dp)
                                         )
                                     }
                                 }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.MyLocation,
-                                    contentDescription = stringResource(R.string.use_my_location),
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
+
+                                // Tombol Favorit
+                                IconButton(onClick = { viewModel.toggleFavorite() }) {
+                                    Icon(
+                                        imageVector = if (isFavorite) Icons.Default.Star else Icons.Outlined.StarBorder,
+                                        contentDescription = null,
+                                        tint = if (isFavorite) Color(0xFFFFD700) else Color.White,
+                                        modifier = Modifier.size(26.dp)
+                                    )
+                                }
                             }
                         }
                     }
-                }
 
                 // 2. Banner Sambutan Saat Pertama Kali Dibuka & Belum Ada Kota Tersimpan (Masalah 2a)
                 if (!hasSavedCity) {
@@ -406,55 +463,66 @@ fun HomeScreen(
                     }
                 }
 
-                // 3. Kolom Pencarian Kota
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        OutlinedTextField(
-                            value = searchQuery,
-                            onValueChange = { searchQuery = it },
-                            label = { Text(stringResource(R.string.search_city)) },
-                            singleLine = true,
-                            shape = RoundedCornerShape(16.dp),
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                            keyboardActions = KeyboardActions(
-                                onSearch = {
-                                    viewModel.search(searchQuery, currentLang)
-                                    keyboardController?.hide()
+                    // 3. Kolom Pencarian Kota (Bisa dibuka/tutup dari icon search di header)
+                    if (isSearchOpen || searchResults.isNotEmpty()) {
+                        item {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                OutlinedTextField(
+                                    value = searchQuery,
+                                    onValueChange = { searchQuery = it },
+                                    label = { Text(stringResource(R.string.search_city), color = Color.White.copy(alpha = 0.8f)) },
+                                    singleLine = true,
+                                    shape = RoundedCornerShape(20.dp),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedTextColor = Color.White,
+                                        unfocusedTextColor = Color.White,
+                                        focusedContainerColor = Color(0x3B101C30),
+                                        unfocusedContainerColor = Color(0x2B101C30),
+                                        focusedBorderColor = Color.White.copy(alpha = 0.35f),
+                                        unfocusedBorderColor = Color.White.copy(alpha = 0.15f)
+                                    ),
+                                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                                    keyboardActions = KeyboardActions(
+                                        onSearch = {
+                                            viewModel.search(searchQuery, currentLang)
+                                            keyboardController?.hide()
+                                        }
+                                    ),
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .focusRequester(searchFocusRequester)
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Button(
+                                    onClick = {
+                                        viewModel.search(searchQuery, currentLang)
+                                        keyboardController?.hide()
+                                    },
+                                    shape = RoundedCornerShape(20.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color.White.copy(alpha = 0.25f)
+                                    )
+                                ) {
+                                    Text(stringResource(R.string.search), color = Color.White)
                                 }
-                            ),
-                            modifier = Modifier
-                                .weight(1f)
-                                .focusRequester(searchFocusRequester)
-                        )
-                        Spacer(Modifier.width(8.dp))
-                        Button(
-                            onClick = {
-                                viewModel.search(searchQuery, currentLang)
-                                keyboardController?.hide()
-                            },
-                            shape = RoundedCornerShape(16.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary
-                            )
-                        ) {
-                            Text(stringResource(R.string.search))
+                            }
                         }
                     }
-                }
 
-                // 4. Hasil Pencarian Kota (Bebas Duplikat, Lengkap Wilayah & Koordinat)
-                items(searchResults, key = { "${it.latitude},${it.longitude},${it.name}" }) { result ->
-                    CityResultItem(
-                        result = result,
-                        onClick = {
-                            viewModel.load(result.latitude, result.longitude, result.name)
-                            searchQuery = ""
-                        }
-                    )
-                }
+                    // 4. Hasil Pencarian Kota (Bebas Duplikat, Lengkap Wilayah & Koordinat)
+                    items(searchResults, key = { "${it.latitude},${it.longitude},${it.name}" }) { result ->
+                        CityResultItem(
+                            result = result,
+                            onClick = {
+                                viewModel.load(result.latitude, result.longitude, result.name)
+                                searchQuery = ""
+                                isSearchOpen = false
+                            }
+                        )
+                    }
 
                 // 5. Konten Berdasarkan State Cuaca
                 when (val state = uiState) {
@@ -526,8 +594,13 @@ fun HomeScreen(
                             }
                         }
 
-                        // 6. Kartu Cuaca Utama (Akurat, Koordinat, Curah Hujan & Awan)
+                        // 6. Hero Weather Section (Persis Screenshot: Suhu Raksasa & Subtitle Tunggal)
                         item {
+                            val todayMin = data.daily.minTemp.firstOrNull()
+                            val todayMax = data.daily.maxTemp.firstOrNull()
+                            val aqiScore = aqi?.current?.usAqi
+                            val aqiCategoryLabel = aqiScore?.let { stringResource(AqiHelper.getAqiCategory(it).labelRes) }
+
                             AnimatedVisibility(
                                 visible = true,
                                 enter = fadeIn() + slideInVertically()
@@ -545,36 +618,52 @@ fun HomeScreen(
                                     isFavorite = isFavorite,
                                     onToggleFavorite = { viewModel.toggleFavorite() },
                                     lastUpdatedTime = state.lastUpdatedTime,
-                                    isOffline = state.isOffline
+                                    isOffline = state.isOffline,
+                                    minTemp = todayMin,
+                                    maxTemp = todayMax,
+                                    aqiVal = aqiScore,
+                                    aqiCategoryLabel = aqiCategoryLabel
                                 )
                             }
                         }
 
-                        // 7. Kartu Statistik Utama (Kelembapan, Angin, Terasa)
+                        // 7. Kartu Kualitas Udara (Persis Card 1 di Screenshot: Leaf + Circular Gauge)
+                        if (aqi?.current?.usAqi != null) {
+                            item {
+                                AirQualityCard(airQuality = aqi)
+                            }
+                        }
+
+                        // 8. Prakiraan Cuaca Per Jam (Persis Card 2 di Screenshot: Sekarang, 21.00, 22.00...)
                         item {
-                            StatsRow(
-                                humidity = data.current.humidity,
-                                windSpeed = data.current.windSpeed,
-                                feelsLike = data.current.feelsLike,
+                            HourlyRow(
+                                hourly = data.hourly,
+                                tempUnit = tempUnit
+                            )
+                        }
+
+                        // 9. Prakiraan Cuaca Beberapa Hari ke Depan (Persis Card 3 di Screenshot: Garis / Daftar)
+                        item {
+                            DailyForecastCard(
+                                daily = data.daily,
                                 tempUnit = tempUnit,
-                                windUnit = windUnit
+                                onDayClick = { index ->
+                                    selectedDay = SelectedDayData(
+                                        dateStr = data.daily.time[index],
+                                        weatherCode = data.daily.weatherCode[index],
+                                        maxTemp = data.daily.maxTemp[index],
+                                        minTemp = data.daily.minTemp[index],
+                                        rainProb = data.daily.rain.getOrNull(index),
+                                        precipitationSum = data.daily.precipitationSum?.getOrNull(index),
+                                        uvIndexMax = data.daily.uvIndexMax?.getOrNull(index),
+                                        sunrise = data.daily.sunrise?.getOrNull(index),
+                                        sunset = data.daily.sunset?.getOrNull(index)
+                                    )
+                                }
                             )
                         }
 
-                        // 8. Kartu Saran Cuaca Hari Ini (Tips Cuaca Otomatis)
-                        item {
-                            WeatherTipsCard(
-                                rainProbMax = data.daily.rain.firstOrNull(),
-                                uvMax = data.daily.uvIndexMax?.firstOrNull(),
-                                maxTemp = data.daily.maxTemp.firstOrNull() ?: 30.0,
-                                minTemp = data.daily.minTemp.firstOrNull() ?: 24.0,
-                                windSpeed = data.current.windSpeed,
-                                aqi = aqi?.current?.usAqi,
-                                weatherCode = data.current.weatherCode
-                            )
-                        }
-
-                        // 8b. Kartu Nowcasting (Prediksi Hujan 60 Menit ke Depan)
+                        // 10. Kartu Nowcasting (Prediksi Hujan 60 Menit ke Depan)
                         if (data.minutely15 != null) {
                             item {
                                 NowcastingCard(
@@ -584,37 +673,7 @@ fun HomeScreen(
                             }
                         }
 
-                        // 9. Judul & Scroll Horizontal Per Jam
-                        item {
-                            Text(
-                                text = stringResource(R.string.hourly_title),
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onBackground
-                            )
-                        }
-
-                        item {
-                            HourlyRow(
-                                hourly = data.hourly,
-                                tempUnit = tempUnit
-                            )
-                        }
-
-                        // 10. Grafik Tren Suhu Canvas (Tahap 2)
-                        item {
-                            HourlyTemperatureChart(
-                                hourly = data.hourly,
-                                tempUnit = tempUnit
-                            )
-                        }
-
-                        // 11. Kartu Kualitas Udara (AQI) (Tahap 2)
-                        item {
-                            AirQualityCard(airQuality = aqi)
-                        }
-
-                        // 12. Grid Detail Cuaca Tambahan (Tekanan, Awan, Curah Hujan, Arah Angin, Jarak Pandang, UV, Matahari)
+                        // 11. Grid Detail Cuaca Tambahan (Tekanan, Awan, Curah Hujan, Arah Angin, Jarak Pandang, UV, Matahari)
                         item {
                             WeatherDetailsCard(
                                 pressureMsl = data.current.pressureMsl,
@@ -628,38 +687,27 @@ fun HomeScreen(
                             )
                         }
 
-                        // 13. Judul & Daftar Prakiraan 7 Hari
+                        // 12. Kartu Statistik Utama (Kelembapan, Angin, Terasa)
                         item {
-                            Text(
-                                text = stringResource(R.string.daily_title),
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onBackground
+                            StatsRow(
+                                humidity = data.current.humidity,
+                                windSpeed = data.current.windSpeed,
+                                feelsLike = data.current.feelsLike,
+                                tempUnit = tempUnit,
+                                windUnit = windUnit
                             )
                         }
 
-                        itemsIndexed(data.daily.time) { index, dateStr ->
-                            DailyCard(
-                                dateStr = dateStr,
-                                weatherCode = data.daily.weatherCode[index],
-                                maxTemp = data.daily.maxTemp[index],
-                                minTemp = data.daily.minTemp[index],
-                                rain = data.daily.rain[index],
-                                precipitationSum = data.daily.precipitationSum?.getOrNull(index),
-                                tempUnit = tempUnit,
-                                onClick = {
-                                    selectedDay = SelectedDayData(
-                                        dateStr = dateStr,
-                                        weatherCode = data.daily.weatherCode[index],
-                                        maxTemp = data.daily.maxTemp[index],
-                                        minTemp = data.daily.minTemp[index],
-                                        rainProb = data.daily.rain[index],
-                                        precipitationSum = data.daily.precipitationSum?.getOrNull(index),
-                                        uvIndexMax = data.daily.uvIndexMax?.getOrNull(index),
-                                        sunrise = data.daily.sunrise?.getOrNull(index),
-                                        sunset = data.daily.sunset?.getOrNull(index)
-                                    )
-                                }
+                        // 13. Kartu Saran Cuaca Hari Ini (Tips Cuaca Otomatis)
+                        item {
+                            WeatherTipsCard(
+                                rainProbMax = data.daily.rain.firstOrNull(),
+                                uvMax = data.daily.uvIndexMax?.firstOrNull(),
+                                maxTemp = data.daily.maxTemp.firstOrNull() ?: 30.0,
+                                minTemp = data.daily.minTemp.firstOrNull() ?: 24.0,
+                                windSpeed = data.current.windSpeed,
+                                aqi = aqi?.current?.usAqi,
+                                weatherCode = data.current.weatherCode
                             )
                         }
                     }

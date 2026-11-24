@@ -1,5 +1,6 @@
 package com.example.cuacaku.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -7,8 +8,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -17,9 +19,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.cuacaku.R
 import com.example.cuacaku.data.remote.Hourly
 import com.example.cuacaku.util.TempUnit
 import com.example.cuacaku.util.UnitConverter
@@ -28,8 +33,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 // =====================================================
-// HourlyRow — Scroll horizontal per jam untuk 24 jam ke depan
-// Menggunakan resolusi cuaca akurat berbasis curah hujan & awan
+// HourlyRow — Kartu Prakiraan Per Jam Persis Screenshot Xiaomi / HyperOS
+// Single unified translucent card dengan deretan jam horizontal
 // =====================================================
 @Composable
 fun HourlyRow(
@@ -49,52 +54,74 @@ fun HourlyRow(
     val endIndex = (startIndex + 24).coerceAtMost(hourly.time.size)
     val hours = (startIndex until endIndex).toList()
 
-    LazyRow(
+    Card(
         modifier = modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(horizontal = 0.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0x3B101C30) // Translucent dark glass
+        ),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.08f))
     ) {
-        items(hours) { i ->
-            val parsedTime = try {
-                LocalDateTime.parse(hourly.time[i], formatter)
-            } catch (_: Exception) { null }
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(22.dp)
+        ) {
+            itemsIndexed(hours) { relativeIndex, i ->
+                val parsedTime = try {
+                    LocalDateTime.parse(hourly.time[i], formatter)
+                } catch (_: Exception) { null }
 
-            val timeDisplay = parsedTime?.format(DateTimeFormatter.ofPattern("HH:mm"))
-                ?: hourly.time[i].takeLast(5)
+                // Item pertama menampilkan "Sekarang", selanjutnya menampilkan jam "21.00"
+                val timeDisplay = if (relativeIndex == 0) {
+                    "Sekarang"
+                } else {
+                    parsedTime?.format(DateTimeFormatter.ofPattern("HH.mm"))
+                        ?: hourly.time[i].takeLast(5).replace(":", ".")
+                }
 
-            // Tentukan apakah jam tersebut siang atau malam (06:00 - 18:00)
-            val isDay = parsedTime?.let { it.hour in 6..18 } ?: true
+                val isDay = parsedTime?.let { it.hour in 6..18 } ?: true
 
-            // Gunakan resolveHourlyWeather agar label & emoji akurat
-            val resolved = resolveHourlyWeather(
-                code = hourly.weatherCode[i],
-                precipitation = hourly.precipitation?.getOrNull(i),
-                cloudCover = hourly.cloudCover?.getOrNull(i),
-                isDay = isDay
-            )
+                val resolved = resolveHourlyWeather(
+                    code = hourly.weatherCode[i],
+                    precipitation = hourly.precipitation?.getOrNull(i),
+                    cloudCover = hourly.cloudCover?.getOrNull(i),
+                    isDay = isDay
+                )
 
-            val tempFormatted = UnitConverter.formatTemperature(hourly.temperature[i], tempUnit)
+                val tempFormatted = UnitConverter.formatTemperature(hourly.temperature[i], tempUnit)
 
-            Card(
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-            ) {
                 Column(
-                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.width(52.dp)
                 ) {
+                    // Waktu (Sekarang / 21.00)
                     Text(
                         text = timeDisplay,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = Color.White.copy(alpha = 0.85f),
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 13.sp
+                        )
                     )
-                    Spacer(Modifier.height(6.dp))
-                    Text(text = resolved.emoji, fontSize = 24.sp)
-                    Spacer(Modifier.height(6.dp))
+
+                    // Ikon Cuaca
+                    Text(
+                        text = resolved.emoji,
+                        fontSize = 24.sp
+                    )
+
+                    // Suhu (26°)
                     Text(
                         text = tempFormatted,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp
+                        )
                     )
                 }
             }

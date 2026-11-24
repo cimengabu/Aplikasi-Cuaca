@@ -16,19 +16,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import kotlinx.coroutines.delay
 import kotlin.math.sin
 import kotlin.random.Random
 
 // =====================================================
-// Kategori Efek Animasi Cuaca
+// Kategori Cuaca untuk Animasi Latar Belakang
 // =====================================================
-private enum class WeatherType {
+private enum class WeatherEffectType {
     SUNNY,
     CLEAR_NIGHT,
     CLOUDY,
@@ -38,21 +36,21 @@ private enum class WeatherType {
     FOG
 }
 
-private fun resolveWeatherType(code: Int, isDay: Boolean): WeatherType {
+private fun resolveEffectType(code: Int, isDay: Boolean): WeatherEffectType {
     return when {
-        code in setOf(95, 96, 99) -> WeatherType.THUNDERSTORM
-        code in setOf(51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82) -> WeatherType.RAIN
-        code in setOf(71, 73, 75, 77, 85, 86) -> WeatherType.SNOW
-        code in setOf(45, 48) -> WeatherType.FOG
-        code in setOf(1, 2, 3) -> WeatherType.CLOUDY
-        isDay -> WeatherType.SUNNY
-        else -> WeatherType.CLEAR_NIGHT
+        code in setOf(95, 96, 99) -> WeatherEffectType.THUNDERSTORM
+        code in setOf(51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82) -> WeatherEffectType.RAIN
+        code in setOf(71, 73, 75, 77, 85, 86) -> WeatherEffectType.SNOW
+        code in setOf(45, 48) -> WeatherEffectType.FOG
+        code in setOf(1, 2, 3) -> WeatherEffectType.CLOUDY
+        isDay -> WeatherEffectType.SUNNY
+        else -> WeatherEffectType.CLEAR_NIGHT
     }
 }
 
 // =====================================================
 // WeatherAnimatedBackground — Latar Belakang Animasi Real-Time
-// Meniru aplikasi cuaca bawaan HP (iOS / Samsung One UI / Pixel)
+// Dibuat persis seperti aplikasi cuaca bawaan Xiaomi / HyperOS / One UI
 // =====================================================
 @Composable
 fun WeatherAnimatedBackground(
@@ -60,118 +58,95 @@ fun WeatherAnimatedBackground(
     isDay: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val type = remember(weatherCode, isDay) { resolveWeatherType(weatherCode, isDay) }
+    val effectType = remember(weatherCode, isDay) { resolveEffectType(weatherCode, isDay) }
 
-    // Warna gradasi latar belakang dinamis berdasarkan kondisi cuaca
-    val backgroundColors = remember(type, isDay) {
-        when (type) {
-            WeatherType.SUNNY -> listOf(
-                Color(0xFF2196F3),
-                Color(0xFF4FC3F7),
-                Color(0xFFFFE082)
+    // Warna gradasi dasar langit atmosferik
+    val skyColors = remember(effectType, isDay) {
+        when (effectType) {
+            WeatherEffectType.RAIN, WeatherEffectType.THUNDERSTORM -> listOf(
+                Color(0xFF0F1726), // Gelap malam kelabu atas
+                Color(0xFF1B2436), // Biru gelap berawan tengah
+                Color(0xFF141C2B)  // Bawah
             )
-            WeatherType.CLEAR_NIGHT -> listOf(
-                Color(0xFF0D1B2A),
-                Color(0xFF1B263B),
-                Color(0xFF0F172A)
+            WeatherEffectType.SUNNY -> listOf(
+                Color(0xFF1E88E5),
+                Color(0xFF42A5F5),
+                Color(0xFF90CAF9)
             )
-            WeatherType.CLOUDY -> if (isDay) {
-                listOf(
-                    Color(0xFF607D8B),
-                    Color(0xFF78909C),
-                    Color(0xFF90A4AE)
-                )
+            WeatherEffectType.CLEAR_NIGHT -> listOf(
+                Color(0xFF090E17),
+                Color(0xFF111A29),
+                Color(0xFF0D1420)
+            )
+            WeatherEffectType.CLOUDY -> if (isDay) {
+                listOf(Color(0xFF455A64), Color(0xFF607D8B), Color(0xFF78909C))
             } else {
-                listOf(
-                    Color(0xFF1E293B),
-                    Color(0xFF334155),
-                    Color(0xFF1E293B)
-                )
+                listOf(Color(0xFF182230), Color(0xFF243242), Color(0xFF182230))
             }
-            WeatherType.RAIN -> if (isDay) {
-                listOf(
-                    Color(0xFF37474F),
-                    Color(0xFF455A64),
-                    Color(0xFF546E7A)
-                )
-            } else {
-                listOf(
-                    Color(0xFF0F172A),
-                    Color(0xFF1E293B),
-                    Color(0xFF0F172A)
-                )
-            }
-            WeatherType.THUNDERSTORM -> listOf(
-                Color(0xFF181824),
-                Color(0xFF22223B),
-                Color(0xFF12121A)
+            WeatherEffectType.SNOW -> listOf(
+                Color(0xFF4A6572),
+                Color(0xFF6A8595),
+                Color(0xFF8AA5B5)
             )
-            WeatherType.SNOW -> listOf(
-                Color(0xFF64B5F6),
-                Color(0xFF90CAF9),
-                Color(0xFFE0F7FA)
-            )
-            WeatherType.FOG -> listOf(
+            WeatherEffectType.FOG -> listOf(
+                Color(0xFF546E7A),
                 Color(0xFF78909C),
-                Color(0xFF90A4AE),
-                Color(0xFFB0BEC5)
+                Color(0xFF90A4AE)
             )
         }
     }
 
-    // Transisi animasi tak terbatas (60fps mulus)
-    val infiniteTransition = rememberInfiniteTransition(label = "weather_anim")
+    val transition = rememberInfiniteTransition(label = "weather_anim")
 
-    // Progress animasi linear berkelanjutan (0f .. 1f berulang)
-    val animProgress by infiniteTransition.animateFloat(
+    // Progress animasi linear (kecepatan stabil untuk partikel)
+    val animProgress by transition.animateFloat(
         initialValue = 0f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 4000, easing = LinearEasing),
+            animation = tween(durationMillis = 2800, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
         ),
-        label = "progress"
+        label = "anim_progress"
     )
 
-    // Denyut sinar matahari untuk cuaca cerah
-    val sunPulse by infiniteTransition.animateFloat(
-        initialValue = 0.85f,
-        targetValue = 1.15f,
+    // Pergerakan awan mengapung perlahan (durasi lebih lambat)
+    val cloudProgress by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 3000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
+            animation = tween(durationMillis = 35000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
         ),
-        label = "sun_pulse"
+        label = "cloud_progress"
     )
 
-    // Kilat petir untuk badai
-    val lightningAlpha = remember { Animatable(0f) }
-    if (type == WeatherType.THUNDERSTORM) {
+    // Kilatan petir realistis saat badai
+    val lightning = remember { Animatable(0f) }
+    if (effectType == WeatherEffectType.THUNDERSTORM) {
         LaunchedEffect(Unit) {
             while (true) {
-                delay(Random.nextLong(3000, 7000))
-                // Flash pertama
-                lightningAlpha.snapTo(0.7f)
-                delay(60)
-                lightningAlpha.snapTo(0.1f)
+                delay(Random.nextLong(3500, 7500))
+                lightning.snapTo(0.65f)
+                delay(50)
+                lightning.snapTo(0.1f)
                 delay(40)
-                // Flash kedua
-                lightningAlpha.snapTo(0.9f)
-                delay(90)
-                lightningAlpha.animateTo(0f, tween(300))
+                lightning.snapTo(0.85f)
+                delay(70)
+                lightning.animateTo(0f, tween(250))
             }
         }
     }
 
-    // Partikel hujan
+    // Partikel hujan (garis miring tipis tajam khas Xiaomi Weather)
     val raindrops = remember {
-        List(65) {
+        List(80) {
             Raindrop(
                 xNorm = Random.nextFloat(),
                 yOffset = Random.nextFloat(),
-                length = Random.nextFloat() * 22f + 18f,
-                speed = Random.nextFloat() * 0.4f + 0.8f,
-                alpha = Random.nextFloat() * 0.4f + 0.3f
+                length = Random.nextFloat() * 26f + 20f,
+                speed = Random.nextFloat() * 0.5f + 1.1f,
+                alpha = Random.nextFloat() * 0.45f + 0.35f,
+                slant = Random.nextFloat() * 3f + 4f
             )
         }
     }
@@ -181,24 +156,10 @@ fun WeatherAnimatedBackground(
         List(50) {
             Star(
                 xNorm = Random.nextFloat(),
-                yNorm = Random.nextFloat() * 0.65f, // Bintang hanya di langit atas
-                radius = Random.nextFloat() * 2.2f + 1f,
+                yNorm = Random.nextFloat() * 0.65f,
+                radius = Random.nextFloat() * 1.8f + 1f,
                 baseAlpha = Random.nextFloat() * 0.6f + 0.3f,
                 speed = Random.nextFloat() * 2f + 1f
-            )
-        }
-    }
-
-    // Partikel salju
-    val snowflakes = remember {
-        List(55) {
-            Snowflake(
-                xNorm = Random.nextFloat(),
-                yOffset = Random.nextFloat(),
-                radius = Random.nextFloat() * 3.5f + 2f,
-                speed = Random.nextFloat() * 0.25f + 0.4f,
-                swingSpeed = Random.nextFloat() * 3f + 1f,
-                alpha = Random.nextFloat() * 0.45f + 0.4f
             )
         }
     }
@@ -208,74 +169,64 @@ fun WeatherAnimatedBackground(
             val width = size.width
             val height = size.height
 
-            // 1. Gambar Gradasi Langit Dinamis
+            // 1. Gambar Gradasi Langit Penuh
             drawRect(
                 brush = Brush.verticalGradient(
-                    colors = backgroundColors,
+                    colors = skyColors,
                     startY = 0f,
                     endY = height
                 ),
                 size = size
             )
 
-            // 2. Gambar Efek Spesifik Berdasarkan Cuaca
-            when (type) {
-                WeatherType.SUNNY -> {
-                    // Sinar & Aura Matahari di Kanan Atas
-                    val sunCenter = Offset(width * 0.82f, height * 0.12f)
-                    val baseRadius = width * 0.38f * sunPulse
+            // 2. Gambar Gumpalan Awan Volumetrik (Persis Screenshot)
+            if (effectType == WeatherEffectType.RAIN || effectType == WeatherEffectType.THUNDERSTORM || effectType == WeatherEffectType.CLOUDY) {
+                drawMoodyStormClouds(width, height, cloudProgress, isDark = !isDay)
+            }
 
-                    drawCircle(
-                        brush = Brush.radialGradient(
-                            colors = listOf(
-                                Color(0x66FFF59D),
-                                Color(0x33FFE082),
-                                Color.Transparent
-                            ),
-                            center = sunCenter,
-                            radius = baseRadius * 1.5f
-                        ),
-                        center = sunCenter,
-                        radius = baseRadius * 1.5f
-                    )
+            // 3. Efek Spesifik Cuaca
+            when (effectType) {
+                WeatherEffectType.RAIN, WeatherEffectType.THUNDERSTORM -> {
+                    // Garis-garis Hujan Menukik
+                    raindrops.forEach { drop ->
+                        val progress = (animProgress * drop.speed + drop.yOffset) % 1f
+                        val y = progress * (height + 100f) - 50f
+                        val x = (drop.xNorm * width - (progress * drop.slant * 8f)) % width
+                        val actualX = if (x < 0) x + width else x
 
-                    drawCircle(
-                        brush = Brush.radialGradient(
-                            colors = listOf(
-                                Color(0xAAFFFFFF),
-                                Color(0x66FFF176),
-                                Color.Transparent
-                            ),
-                            center = sunCenter,
-                            radius = baseRadius * 0.6f
-                        ),
-                        center = sunCenter,
-                        radius = baseRadius * 0.6f
-                    )
+                        drawLine(
+                            color = Color(0xFFD4E4F7).copy(alpha = drop.alpha),
+                            start = Offset(actualX, y),
+                            end = Offset(actualX - drop.slant, y + drop.length),
+                            strokeWidth = 1.6f
+                        )
+                    }
+
+                    // Kilatan Petir Menerangi Langit
+                    if (lightning.value > 0f) {
+                        drawRect(
+                            color = Color(0xFFA5C8F7).copy(alpha = lightning.value),
+                            size = size
+                        )
+                    }
                 }
 
-                WeatherType.CLEAR_NIGHT -> {
+                WeatherEffectType.CLEAR_NIGHT -> {
                     // Bintang Berkelip
                     stars.forEach { star ->
-                        val twinkle = (sin((animProgress * 6.28f * star.speed) + star.xNorm * 10f) + 1f) / 2f
-                        val alpha = (star.baseAlpha * (0.4f + 0.6f * twinkle)).coerceIn(0f, 1f)
-
+                        val twinkle = (sin(animProgress * 6.28f * star.speed + star.xNorm * 10f) + 1f) / 2f
+                        val alpha = (star.baseAlpha * (0.3f + 0.7f * twinkle)).coerceIn(0f, 1f)
                         drawCircle(
                             color = Color.White.copy(alpha = alpha),
                             radius = star.radius,
                             center = Offset(star.xNorm * width, star.yNorm * height)
                         )
                     }
-
-                    // Cahaya Bulan Lembut di Kanan Atas
-                    val moonCenter = Offset(width * 0.8f, height * 0.12f)
+                    // Cahaya Bulan Lembut
+                    val moonCenter = Offset(width * 0.82f, height * 0.12f)
                     drawCircle(
                         brush = Brush.radialGradient(
-                            colors = listOf(
-                                Color(0x44E0E7FF),
-                                Color(0x11818CF8),
-                                Color.Transparent
-                            ),
+                            colors = listOf(Color(0x33D1E0FF), Color.Transparent),
                             center = moonCenter,
                             radius = width * 0.35f
                         ),
@@ -284,145 +235,93 @@ fun WeatherAnimatedBackground(
                     )
                 }
 
-                WeatherType.CLOUDY -> {
-                    // Awan Berarak Pelan di Langit
-                    drawDriftingClouds(width, height, animProgress, isDay)
+                WeatherEffectType.SUNNY -> {
+                    val sunCenter = Offset(width * 0.82f, height * 0.12f)
+                    drawCircle(
+                        brush = Brush.radialGradient(
+                            colors = listOf(Color(0x66FFF59D), Color(0x22FFE082), Color.Transparent),
+                            center = sunCenter,
+                            radius = width * 0.45f
+                        ),
+                        center = sunCenter,
+                        radius = width * 0.45f
+                    )
                 }
 
-                WeatherType.RAIN, WeatherType.THUNDERSTORM -> {
-                    // Butiran Hujan Jatuh Menukik
-                    raindrops.forEach { drop ->
-                        val progressWithOffset = (animProgress * drop.speed + drop.yOffset) % 1f
-                        val y = progressWithOffset * (height + 100f) - 50f
-                        val x = (drop.xNorm * width - (progressWithOffset * 60f)) % width
-                        val actualX = if (x < 0) x + width else x
-
-                        drawLine(
-                            color = Color(0xCCB0BEC5).copy(alpha = drop.alpha),
-                            start = Offset(actualX, y),
-                            end = Offset(actualX - 8f, y + drop.length),
-                            strokeWidth = 2f
-                        )
-                    }
-
-                    // Awan Mendung di Atas
-                    drawDriftingClouds(width, height, animProgress * 0.5f, isDay = false)
-
-                    // Kilatan Petir (Jika Thunderstorm)
-                    if (lightningAlpha.value > 0f) {
-                        drawRect(
-                            color = Color(0xEEFFFFFF).copy(alpha = lightningAlpha.value),
-                            size = size
-                        )
-                    }
-                }
-
-                WeatherType.SNOW -> {
-                    // Kepingan Salju Melayang Perlahan & Bergoyang
-                    snowflakes.forEach { flake ->
-                        val progressWithOffset = (animProgress * flake.speed + flake.yOffset) % 1f
-                        val y = progressWithOffset * (height + 50f) - 20f
-                        val sway = sin(animProgress * 6.28f * flake.swingSpeed + flake.yOffset * 10f) * 20f
+                WeatherEffectType.SNOW -> {
+                    raindrops.take(45).forEach { flake ->
+                        val progress = (animProgress * flake.speed * 0.4f + flake.yOffset) % 1f
+                        val y = progress * (height + 50f) - 20f
+                        val sway = sin(animProgress * 6.28f + flake.yOffset * 10f) * 15f
                         val x = (flake.xNorm * width + sway) % width
                         val actualX = if (x < 0) x + width else x
 
                         drawCircle(
                             color = Color.White.copy(alpha = flake.alpha),
-                            radius = flake.radius,
+                            radius = 3.2f,
                             center = Offset(actualX, y)
                         )
                     }
                 }
 
-                WeatherType.FOG -> {
-                    // Lapisan Kabut Horizontal yang Berombak
-                    val fogAlpha = (sin(animProgress * 6.28f) * 0.15f + 0.35f).coerceIn(0.2f, 0.5f)
-                    drawRect(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(
-                                Color.Transparent,
-                                Color(0x99CFD8DC).copy(alpha = fogAlpha),
-                                Color(0x77B0BEC5).copy(alpha = fogAlpha * 0.7f),
-                                Color.Transparent
-                            ),
-                            startY = height * 0.2f,
-                            endY = height * 0.85f
-                        ),
-                        size = size
-                    )
-                }
+                else -> {}
             }
         }
     }
 }
 
 // =====================================================
-// Helper Penggambar Awan Mengapung
+// Helper Penggambar Awan Badai Volumetrik (Persis Screenshot)
 // =====================================================
-private fun DrawScope.drawDriftingClouds(
+private fun DrawScope.drawMoodyStormClouds(
     width: Float,
     height: Float,
     progress: Float,
-    isDay: Boolean
+    isDark: Boolean
 ) {
-    val cloudColor = if (isDay) Color(0x33FFFFFF) else Color(0x221E293B)
-    val cloudColorFront = if (isDay) Color(0x44FFFFFF) else Color(0x33334155)
+    val cloudBase = if (isDark) Color(0xFF121B2A) else Color(0xFF4A5C68)
+    val cloudHighlight = if (isDark) Color(0xFF223147) else Color(0xFF758A99)
+    val cloudDark = if (isDark) Color(0xFF0A101A) else Color(0xFF2E3D47)
 
-    // Layer Awan 1 (Belakang, Bergerak Pelan)
-    val offset1 = (progress * width * 0.4f) % (width + 300f)
-    drawCloudShape(
-        centerX = offset1 - 100f,
-        centerY = height * 0.15f,
-        radius = width * 0.28f,
-        color = cloudColor
+    val drift = (progress * width * 0.25f) % (width * 0.5f)
+
+    // Awan Lapisan Atas (Paling Gelap & Tebal di Belakang Judul & Suhu)
+    drawCircle(
+        color = cloudDark.copy(alpha = 0.85f),
+        radius = width * 0.42f,
+        center = Offset(width * 0.2f + drift, height * 0.08f)
     )
-    drawCloudShape(
-        centerX = offset1 + width * 0.45f,
-        centerY = height * 0.18f,
-        radius = width * 0.32f,
-        color = cloudColor
+    drawCircle(
+        color = cloudHighlight.copy(alpha = 0.5f),
+        radius = width * 0.48f,
+        center = Offset(width * 0.75f - drift, height * 0.12f)
+    )
+    drawCircle(
+        color = cloudBase.copy(alpha = 0.9f),
+        radius = width * 0.55f,
+        center = Offset(width * 0.5f, height * 0.05f)
     )
 
-    // Layer Awan 2 (Depan)
-    val offset2 = ((progress * 1.4f) * width * 0.4f) % (width + 350f)
-    drawCloudShape(
-        centerX = width - offset2 + 100f,
-        centerY = height * 0.08f,
-        radius = width * 0.22f,
-        color = cloudColorFront
+    // Awan Lapisan Tengah (Di Bawah Suhu Utama)
+    drawCircle(
+        color = cloudHighlight.copy(alpha = 0.35f),
+        radius = width * 0.45f,
+        center = Offset(width * 0.15f - drift * 0.5f, height * 0.26f)
+    )
+    drawCircle(
+        color = cloudDark.copy(alpha = 0.7f),
+        radius = width * 0.5f,
+        center = Offset(width * 0.85f + drift * 0.5f, height * 0.24f)
     )
 }
 
-private fun DrawScope.drawCloudShape(
-    centerX: Float,
-    centerY: Float,
-    radius: Float,
-    color: Color
-) {
-    drawCircle(
-        color = color,
-        radius = radius,
-        center = Offset(centerX, centerY)
-    )
-    drawCircle(
-        color = color,
-        radius = radius * 0.75f,
-        center = Offset(centerX - radius * 0.65f, centerY + radius * 0.2f)
-    )
-    drawCircle(
-        color = color,
-        radius = radius * 0.8f,
-        center = Offset(centerX + radius * 0.65f, centerY + radius * 0.15f)
-    )
-}
-
-// Data class partikel
 private data class Raindrop(
     val xNorm: Float,
     val yOffset: Float,
     val length: Float,
     val speed: Float,
-    val alpha: Float
+    val alpha: Float,
+    val slant: Float
 )
 
 private data class Star(
@@ -431,13 +330,4 @@ private data class Star(
     val radius: Float,
     val baseAlpha: Float,
     val speed: Float
-)
-
-private data class Snowflake(
-    val xNorm: Float,
-    val yOffset: Float,
-    val radius: Float,
-    val speed: Float,
-    val swingSpeed: Float,
-    val alpha: Float
 )
