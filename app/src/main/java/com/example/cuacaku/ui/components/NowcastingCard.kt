@@ -1,5 +1,6 @@
 package com.example.cuacaku.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,7 +18,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -25,7 +25,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,11 +41,11 @@ import java.util.Locale
 
 // =====================================================
 // NowcastingCard — Prediksi Hujan Jangka Pendek (Menit ke Depan)
+// Translucent frosted glass look ala Xiaomi
 // =====================================================
 @Composable
 fun NowcastingCard(
     minutely15: Minutely15?,
-    onOpenRadar: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     if (minutely15 == null || minutely15.precipitation.isEmpty()) return
@@ -67,7 +66,7 @@ fun NowcastingCard(
             val minutes = rainStartIndex * 15
             Pair(
                 stringResource(R.string.nowcast_rain_in_minutes, minutes),
-                Color(0xFFFF9800) // Oranye peringatan
+                Color(0xFFFFB74D) // Oranye peringatan
             )
         }
         // Saat ini hujan, tetapi diprediksi reda
@@ -75,29 +74,32 @@ fun NowcastingCard(
             val minutes = rainStopIndex * 15
             Pair(
                 stringResource(R.string.nowcast_rain_stopping_in_minutes, minutes),
-                Color(0xFF4CAF50) // Hijau melegakan
+                Color(0xFF81C784) // Hijau melegakan
             )
         }
         // Sedang hujan berkelanjutan
         firstPrecip >= 0.2 -> {
             Pair(
                 stringResource(R.string.nowcast_rain_continuing),
-                Color(0xFF2196F3) // Biru hujan
+                Color(0xFF64B5F6) // Biru hujan
             )
         }
         // Tidak ada hujan dalam 1-2 jam ke depan
         else -> {
             Pair(
                 stringResource(R.string.nowcast_no_rain),
-                MaterialTheme.colorScheme.primary
+                Color.White.copy(alpha = 0.9f)
             )
         }
     }
 
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0x3B101C30)
+        ),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.08f))
     ) {
         Column(
             modifier = Modifier
@@ -105,50 +107,30 @@ fun NowcastingCard(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Header: Judul & Akses Cepat ke Peta Radar
+            // Header: Judul
             Row(
-                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Schedule,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Text(
-                        text = stringResource(R.string.nowcast_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-
-                TextButton(onClick = onOpenRadar) {
-                    Text(
-                        text = stringResource(R.string.nowcast_view_radar),
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
+                Icon(
+                    imageVector = Icons.Default.Schedule,
+                    contentDescription = null,
+                    tint = Color.White.copy(alpha = 0.9f),
+                    modifier = Modifier.size(20.dp)
+                )
+                Text(
+                    text = stringResource(R.string.nowcast_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
             }
 
             // Banner Kesimpulan Nowcasting
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
-                color = summaryColor.copy(alpha = 0.12f)
+                color = summaryColor.copy(alpha = 0.15f)
             ) {
                 Row(
                     modifier = Modifier
@@ -184,11 +166,10 @@ fun NowcastingCard(
                     Surface(
                         shape = RoundedCornerShape(14.dp),
                         color = if (precip >= 0.2) {
-                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f)
+                            Color.White.copy(alpha = 0.18f)
                         } else {
-                            MaterialTheme.colorScheme.surface
-                        },
-                        shadowElevation = 1.dp
+                            Color.White.copy(alpha = 0.08f)
+                        }
                     ) {
                         Column(
                             modifier = Modifier
@@ -201,7 +182,7 @@ fun NowcastingCard(
                                 text = "+${minutesAhead}m",
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = Color.White.copy(alpha = 0.85f)
                             )
                             Text(
                                 text = weatherInfo.emoji,
@@ -212,7 +193,7 @@ fun NowcastingCard(
                                 style = MaterialTheme.typography.labelSmall,
                                 fontSize = 10.sp,
                                 fontWeight = if (precip >= 0.2) FontWeight.Bold else FontWeight.Normal,
-                                color = if (precip >= 0.2) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+                                color = if (precip >= 0.2) Color(0xFF64B5F6) else Color.White.copy(alpha = 0.6f)
                             )
                         }
                     }

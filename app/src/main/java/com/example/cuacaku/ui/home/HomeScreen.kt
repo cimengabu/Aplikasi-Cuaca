@@ -118,7 +118,6 @@ import java.util.Locale
 @Composable
 fun HomeScreen(
     viewModel: WeatherViewModel,
-    onNavigateToRadar: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -667,8 +666,7 @@ fun HomeScreen(
                         if (data.minutely15 != null) {
                             item {
                                 NowcastingCard(
-                                    minutely15 = data.minutely15,
-                                    onOpenRadar = onNavigateToRadar
+                                    minutely15 = data.minutely15
                                 )
                             }
                         }

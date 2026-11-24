@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
@@ -23,33 +22,28 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cuacaku.R
 import com.example.cuacaku.ui.FavoritesViewModel
 import com.example.cuacaku.ui.SettingsViewModel
 import com.example.cuacaku.ui.WeatherViewModel
 import com.example.cuacaku.ui.favorites.FavoritesScreen
 import com.example.cuacaku.ui.home.HomeScreen
-import com.example.cuacaku.ui.radar.RadarScreen
-import com.example.cuacaku.ui.radar.RadarViewModel
 import com.example.cuacaku.ui.settings.SettingsScreen
 
 enum class AppScreen(val titleRes: Int, val icon: ImageVector) {
     HOME(R.string.nav_home, Icons.Default.Home),
-    RADAR(R.string.nav_radar, Icons.Default.Map),
     FAVORITES(R.string.nav_favorites, Icons.Default.Star),
     SETTINGS(R.string.nav_settings, Icons.Default.Settings)
 }
 
 // =====================================================
-// AppNavigation — Struktur navigasi utama dengan Bottom Navigation Bar
+// AppNavigation — Struktur navigasi utama dengan 3 Tab Wajib
 // =====================================================
 @Composable
 fun AppNavigation(
     weatherViewModel: WeatherViewModel,
     favoritesViewModel: FavoritesViewModel,
     settingsViewModel: SettingsViewModel,
-    radarViewModel: RadarViewModel = viewModel(),
     onApplyTheme: (String) -> Unit,
     onApplyLanguage: (String) -> Unit
 ) {
@@ -86,18 +80,7 @@ fun AppNavigation(
             Crossfade(targetState = currentScreen, label = "screen_transition") { screen ->
                 when (screen) {
                     AppScreen.HOME -> {
-                        HomeScreen(
-                            viewModel = weatherViewModel,
-                            onNavigateToRadar = { currentScreen = AppScreen.RADAR }
-                        )
-                    }
-                    AppScreen.RADAR -> {
-                        RadarScreen(
-                            radarViewModel = radarViewModel,
-                            cityLat = weatherViewModel.currentLat.doubleValue,
-                            cityLon = weatherViewModel.currentLon.doubleValue,
-                            cityName = weatherViewModel.cityName.value
-                        )
+                        HomeScreen(viewModel = weatherViewModel)
                     }
                     AppScreen.FAVORITES -> {
                         FavoritesScreen(
