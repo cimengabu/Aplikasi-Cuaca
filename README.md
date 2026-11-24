@@ -7,7 +7,7 @@ Aplikasi cuaca Android modern dan lengkap yang dibangun menggunakan **Jetpack Co
 ## ✨ Fitur Lengkap
 
 ### 🏠 Tahap 1: Fitur Dasar Lanjutan
-- 🧭 **Navigasi Bawah (Bottom Navigation)**: 3 halaman utama (**Beranda**, **Favorit**, **Pengaturan**) dengan ikon dan label resmi Material 3.
+- 🧭 **Navigasi Bawah (Bottom Navigation)**: 4 halaman utama (**Beranda**, **Radar**, **Favorit**, **Pengaturan**) dengan ikon dan label resmi Material 3.
 - ⭐ **Kota Favorit**: Simpan kota aktif ke daftar favorit secara instan menggunakan ikon bintang di Beranda; kelola dan hapus daftar kota favorit dengan dialog konfirmasi. Data tersimpan permanen di **DataStore**.
 - ⚙️ **Pengaturan Lengkap**:
   - Satuan suhu: **Celsius (°C)** / **Fahrenheit (°F)**
@@ -29,6 +29,8 @@ Aplikasi cuaca Android modern dan lengkap yang dibangun menggunakan **Jetpack Co
 ### 📍 Tahap 3: Fitur Ekstra & Ketepatan Data
 - 🛰️ **Lokasi GPS Cerdas ("Gunakan Lokasi Saya")**: Menggunakan Google Play Services Location (`FusedLocationProviderClient.getCurrentLocation` + fallback `lastLocation`) dan Android `Geocoder` di thread background. Menangani semua skenario izin dan GPS mati secara komprehensif dengan Snackbar interaktif (tombol menuju Pengaturan Izin / Pengaturan Layanan Lokasi).
 - 🎯 **Akurasi Label Cuaca Berbasis Curah Hujan & Tutupan Awan**: Memadukan WMO weather code dengan nilai curah hujan (`precipitation`) dan tutupan awan (`cloud_cover`). Menghilangkan anomali label "Gerimis" saat langit hanya berawan tanpa hujan nyata (< 0.2 mm). Nilai curah hujan (mm) dan tutupan awan (%) ditampilkan transparan pada kartu utama dan kartu rincian.
+- ⏱️ **Prediksi Menit ke Depan (Nowcasting Card)**: Menggunakan Open-Meteo `minutely_15` API untuk mendeteksi kapan hujan mulai atau reda dalam rentang 15–60 menit ke depan, lengkap dengan timeline blok interval 15 menit dan tombol cepat ke Peta Radar.
+- 📡 **Peta Radar Cuaca Interaktif (RainViewer API)**: Tab khusus Radar Cuaca dengan peta interaktif (OpenStreetMap + RainViewer Radar tiles), animasi pergerakan awan hujan (Play/Pause otomatis), slider linimasa waktu pemindaian, tombol pusatkan lokasi, dan skala intensitas presipitasi (dBZ).
 - 👋 **Banner Sambutan Pertama Kali**: Pengguna baru disambut dengan dialog/banner ramah untuk memilih lokasi GPS atau mencari kota, tanpa langsung memaksakan kota default tanpa penjelasan.
 - 🔍 **Pencarian Kota Bersih & Koordinat Transparan**: Menampilkan wilayah administratif (`admin1`), negara, serta menyaring duplikat hasil pencarian. Koordinat latitude dan longitude lokasi aktif ditampilkan rapi di bawah nama kota.
 - 🌐 **Dukungan Tiga Bahasa**: Dilengkapi terjemahan lengkap dalam **Bahasa Indonesia** (`values-in`), **English** (`values`), dan **Basa Jawa** (`values-jv`).

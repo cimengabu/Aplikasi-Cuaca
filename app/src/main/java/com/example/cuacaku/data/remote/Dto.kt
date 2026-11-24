@@ -10,7 +10,17 @@ import com.google.gson.annotations.SerializedName
 data class WeatherResponse(
     val current: Current,
     val hourly: Hourly,
-    val daily: Daily
+    val daily: Daily,
+    @SerializedName("minutely_15")
+    val minutely15: Minutely15? = null
+)
+
+/** Data presipitasi jangka pendek interval 15 menit (Nowcasting) */
+data class Minutely15(
+    val time: List<String>,
+    val precipitation: List<Double>,
+    @SerializedName("weather_code")
+    val weatherCode: List<Int>
 )
 
 /** Data cuaca saat ini */
@@ -114,4 +124,28 @@ data class AirQualityCurrent(
     val pm10: Double? = null,
     @SerializedName("pm2_5")
     val pm25: Double? = null
+)
+
+// =====================================================
+// Data class untuk respon RainViewer Radar API
+// =====================================================
+
+/** Respon utama dari endpoint https://api.rainviewer.com/public/weather-maps.json */
+data class RainViewerResponse(
+    val version: String? = null,
+    val generated: Long? = null,
+    val host: String? = null,
+    val radar: RainViewerRadar? = null
+)
+
+/** Kumpulan frame radar waktu lampau (past) dan nowcast masa depan */
+data class RainViewerRadar(
+    val past: List<RadarFrame>? = null,
+    val nowcast: List<RadarFrame>? = null
+)
+
+/** Satu frame snapshot pemindaian radar */
+data class RadarFrame(
+    val time: Long,
+    val path: String
 )

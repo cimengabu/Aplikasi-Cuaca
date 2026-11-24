@@ -3,6 +3,7 @@ package com.example.cuacaku.data
 import com.example.cuacaku.data.remote.AirQualityResponse
 import com.example.cuacaku.data.remote.GeoResult
 import com.example.cuacaku.data.remote.NetworkModule
+import com.example.cuacaku.data.remote.RainViewerResponse
 import com.example.cuacaku.data.remote.WeatherResponse
 import java.util.Locale
 
@@ -43,6 +44,17 @@ class WeatherRepository {
             }
         } catch (_: Exception) {
             emptyList()
+        }
+    }
+
+    /**
+     * Mengambil metadata peta radar cuaca dari RainViewer.
+     */
+    suspend fun radarMaps(): RainViewerResponse? {
+        return try {
+            NetworkModule.rainViewerApi.getWeatherMaps()
+        } catch (_: Exception) {
+            null
         }
     }
 }

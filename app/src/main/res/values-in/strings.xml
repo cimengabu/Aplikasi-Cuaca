@@ -4,6 +4,7 @@
 
     <!-- Navigation -->
     <string name="nav_home">Beranda</string>
+    <string name="nav_radar">Radar</string>
     <string name="nav_favorites">Favorit</string>
     <string name="nav_settings">Pengaturan</string>
 
@@ -54,6 +55,7 @@
     <string name="rain_probability">Peluang Hujan</string>
     <string name="error_network">Gagal memuat data. Periksa koneksi internetmu.</string>
     <string name="retry">Coba lagi</string>
+    <string name="refresh">Perbarui</string>
     <string name="close">Tutup</string>
 
     <!-- UV Index Categories -->
@@ -135,4 +137,29 @@
     <string name="w_snow">Salju</string>
     <string name="w_thunder">Badai petir</string>
     <string name="w_unknown">Tidak diketahui</string>
+
+    <!-- Radar & Nowcasting -->
+    <string name="radar_title">Peta Radar Cuaca</string>
+    <string name="radar_loading">Memuat frame radar cuaca…</string>
+    <string name="radar_error_title">Gagal Memuat Radar</string>
+    <string name="radar_center_my_location">Pusatkan ke lokasi</string>
+    <string name="radar_live">Langsung</string>
+    <string name="radar_nowcast">Nowcast</string>
+    <string name="radar_timeline_title">Linimasa Pergerakan Hujan</string>
+    <string name="radar_tag_nowcast">Prediksi Masa Depan (Nowcast)</string>
+    <string name="radar_tag_recorded">Pengamatan Radar Lampau</string>
+    <string name="radar_legend_title">Intensitas Curah Hujan</string>
+    <string name="radar_drizzle">Gerimis</string>
+    <string name="radar_light_rain">Ringan</string>
+    <string name="radar_moderate_rain">Sedang</string>
+    <string name="radar_heavy_rain">Lebat</string>
+    <string name="radar_storm">Badai</string>
+    <string name="radar_info_title">Cara Kerja Radar &amp; Nowcasting</string>
+    <string name="radar_info_desc">Stasiun radar memancarkan gelombang radio ke atmosfer. Dari pantulan tetesan hujan berurutan, sistem menghitung arah dan kecepatan badai (optical flow) untuk memproyeksikan pergerakan awan 0–60 menit ke depan.</string>
+    <string name="nowcast_title">Prediksi 60 Menit (Nowcasting)</string>
+    <string name="nowcast_view_radar">Lihat Radar</string>
+    <string name="nowcast_rain_in_minutes">Kemungkinan hujan mulai dalam ~%1$d menit</string>
+    <string name="nowcast_rain_stopping_in_minutes">Hujan diperkirakan reda dalam ~%1$d menit</string>
+    <string name="nowcast_rain_continuing">Hujan diperkirakan berlanjut selama 1 jam ke depan</string>
+    <string name="nowcast_no_rain">Tidak ada potensi hujan dalam 1–2 jam ke depan</string>
 </resources>

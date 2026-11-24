@@ -88,6 +88,7 @@ import com.example.cuacaku.ui.components.DailyCard
 import com.example.cuacaku.ui.components.DayDetailBottomSheet
 import com.example.cuacaku.ui.components.HourlyRow
 import com.example.cuacaku.ui.components.HourlyTemperatureChart
+import com.example.cuacaku.ui.components.NowcastingCard
 import com.example.cuacaku.ui.components.SelectedDayData
 import com.example.cuacaku.ui.components.StatsRow
 import com.example.cuacaku.ui.components.WeatherDetailsCard
@@ -109,6 +110,7 @@ import java.util.Locale
 @Composable
 fun HomeScreen(
     viewModel: WeatherViewModel,
+    onNavigateToRadar: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -555,6 +557,16 @@ fun HomeScreen(
                                 aqi = aqi?.current?.usAqi,
                                 weatherCode = data.current.weatherCode
                             )
+                        }
+
+                        // 8b. Kartu Nowcasting (Prediksi Hujan 60 Menit ke Depan)
+                        if (data.minutely15 != null) {
+                            item {
+                                NowcastingCard(
+                                    minutely15 = data.minutely15,
+                                    onOpenRadar = onNavigateToRadar
+                                )
+                            }
                         }
 
                         // 9. Judul & Scroll Horizontal Per Jam

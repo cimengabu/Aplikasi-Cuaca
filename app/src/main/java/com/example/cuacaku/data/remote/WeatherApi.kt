@@ -16,6 +16,8 @@ interface WeatherApi {
         @Query("current") current: String = "temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code,is_day,pressure_msl,cloud_cover,wind_direction_10m,visibility,precipitation,rain",
         @Query("hourly") hourly: String = "temperature_2m,weather_code,precipitation,precipitation_probability,cloud_cover",
         @Query("daily") daily: String = "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset,uv_index_max,precipitation_sum",
+        @Query("minutely_15") minutely15: String = "precipitation,weather_code",
+        @Query("forecast_minutely_15") forecastMinutely15: Int = 12,
         @Query("timezone") timezone: String = "auto",
         @Query("forecast_days") forecastDays: Int = 7
     ): WeatherResponse
@@ -47,6 +49,14 @@ interface AirQualityApi {
 }
 
 // =====================================================
+// Interface Retrofit untuk RainViewer Radar API (Peta Radar)
+// =====================================================
+interface RainViewerApi {
+    @GET("public/weather-maps.json")
+    suspend fun getWeatherMaps(): RainViewerResponse
+}
+
+// =====================================================
 // Singleton untuk membuat instance Retrofit
 // =====================================================
 object NetworkModule {
@@ -75,5 +85,14 @@ object NetworkModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(AirQualityApi::class.java)
+    }
+
+    /** Retrofit untuk API peta radar RainViewer */
+    val rainViewerApi: RainViewerApi by lazy {
+        Retrofit.Builder()
+            .baseUrl("https://api.rainviewer.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(RainViewerApi::class.java)
     }
 }

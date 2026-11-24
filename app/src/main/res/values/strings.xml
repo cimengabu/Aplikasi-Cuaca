@@ -4,6 +4,7 @@
 
     <!-- Navigation -->
     <string name="nav_home">Home</string>
+    <string name="nav_radar">Radar</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_settings">Settings</string>
 
@@ -54,6 +55,7 @@
     <string name="rain_probability">Rain Probability</string>
     <string name="error_network">Failed to load data. Check your internet connection.</string>
     <string name="retry">Retry</string>
+    <string name="refresh">Refresh</string>
     <string name="close">Close</string>
 
     <!-- UV Index Categories -->
@@ -135,4 +137,29 @@
     <string name="w_snow">Snow</string>
     <string name="w_thunder">Thunderstorm</string>
     <string name="w_unknown">Unknown</string>
+
+    <!-- Radar & Nowcasting -->
+    <string name="radar_title">Weather Radar Map</string>
+    <string name="radar_loading">Loading radar frames…</string>
+    <string name="radar_error_title">Failed to Load Radar</string>
+    <string name="radar_center_my_location">Center on my location</string>
+    <string name="radar_live">Live</string>
+    <string name="radar_nowcast">Nowcast</string>
+    <string name="radar_timeline_title">Rain Movement Timeline</string>
+    <string name="radar_tag_nowcast">Future Prediction (Nowcast)</string>
+    <string name="radar_tag_recorded">Past Observation</string>
+    <string name="radar_legend_title">Precipitation Intensity</string>
+    <string name="radar_drizzle">Drizzle</string>
+    <string name="radar_light_rain">Light</string>
+    <string name="radar_moderate_rain">Moderate</string>
+    <string name="radar_heavy_rain">Heavy</string>
+    <string name="radar_storm">Storm</string>
+    <string name="radar_info_title">How Radar &amp; Nowcasting Works</string>
+    <string name="radar_info_desc">Radar stations emit radio waves to detect rain droplets in the atmosphere. By tracking storm movement across consecutive scans (optical flow), the app projects cloud motion for the next 0–60 minutes.</string>
+    <string name="nowcast_title">60-Min Nowcasting</string>
+    <string name="nowcast_view_radar">View Radar</string>
+    <string name="nowcast_rain_in_minutes">Rain likely starting in ~%1$d minutes</string>
+    <string name="nowcast_rain_stopping_in_minutes">Rain expected to stop in ~%1$d minutes</string>
+    <string name="nowcast_rain_continuing">Rain expected to continue for the next hour</string>
+    <string name="nowcast_no_rain">No rain expected in the next 1–2 hours</string>
 </resources>

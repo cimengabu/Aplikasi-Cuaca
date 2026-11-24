@@ -4,6 +4,7 @@
 
     <!-- Navigation -->
     <string name="nav_home">Griya</string>
+    <string name="nav_radar">Radar</string>
     <string name="nav_favorites">Favorit</string>
     <string name="nav_settings">Setelan</string>
 
@@ -54,6 +55,7 @@
     <string name="rain_probability">Peluang Udan</string>
     <string name="error_network">Gagal mendhet data. Priksa sambungan internet sampeyan.</string>
     <string name="retry">Cobi malih</string>
+    <string name="refresh">Anyari</string>
     <string name="close">Tutup</string>
 
     <!-- UV Index Categories -->
@@ -135,4 +137,29 @@
     <string name="w_snow">Salju</string>
     <string name="w_thunder">Prahara bledheg</string>
     <string name="w_unknown">Mboten mangertos</string>
+
+    <!-- Radar & Nowcasting -->
+    <string name="radar_title">Peta Radar Cuaca</string>
+    <string name="radar_loading">Ngundhuh frame radar cuaca…</string>
+    <string name="radar_error_title">Gagal Ngundhuh Radar</string>
+    <string name="radar_center_my_location">Pusataken ing lokasi</string>
+    <string name="radar_live">Langsung</string>
+    <string name="radar_nowcast">Nowcast</string>
+    <string name="radar_timeline_title">Linimasa Obahing Udan</string>
+    <string name="radar_tag_nowcast">Prediksi Masa Ngarep (Nowcast)</string>
+    <string name="radar_tag_recorded">Pangawasan Radar Sadurunge</string>
+    <string name="radar_legend_title">Derasipun Udan</string>
+    <string name="radar_drizzle">Grimis</string>
+    <string name="radar_light_rain">Glempang</string>
+    <string name="radar_moderate_rain">Sedhengan</string>
+    <string name="radar_heavy_rain">Deres</string>
+    <string name="radar_storm">Bledheg</string>
+    <string name="radar_info_title">Cara Kerjane Radar &amp; Nowcasting</string>
+    <string name="radar_info_desc">Stasiun radar mancarake gelombang radio menyang awang-awang. Saka pantulan tetesan udan, sistem ngetung playune mega (optical flow) kanggo mangerteni udan 0–60 menit sakbanjure.</string>
+    <string name="nowcast_title">Prediksi 60 Menit (Nowcasting)</string>
+    <string name="nowcast_view_radar">Deleng Radar</string>
+    <string name="nowcast_rain_in_minutes">Udan kira-kira wiwit ~%1$d menit malih</string>
+    <string name="nowcast_rain_stopping_in_minutes">Udan kira-kira leren ~%1$d menit malih</string>
+    <string name="nowcast_rain_continuing">Udan dikira terus lumaku sejam ngarep</string>
+    <string name="nowcast_no_rain">Mboten wonten udan sakjrone 1–2 jam ngarep</string>
 </resources>
