@@ -91,6 +91,7 @@ import com.example.cuacaku.ui.components.HourlyTemperatureChart
 import com.example.cuacaku.ui.components.NowcastingCard
 import com.example.cuacaku.ui.components.SelectedDayData
 import com.example.cuacaku.ui.components.StatsRow
+import com.example.cuacaku.ui.components.WeatherAnimatedBackground
 import com.example.cuacaku.ui.components.WeatherDetailsCard
 import com.example.cuacaku.ui.components.WeatherTipsCard
 import com.google.android.gms.location.LocationServices
@@ -256,47 +257,61 @@ fun HomeScreen(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = Color.Transparent,
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
-        PullToRefreshBox(
-            isRefreshing = isRefreshing,
-            onRefresh = { viewModel.refresh(silent = true) },
+        val currentWeather = (uiState as? WeatherUiState.Success)?.data?.current
+        val weatherCode = currentWeather?.weatherCode ?: 0
+        val isDay = currentWeather?.isDay == 1
+
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                // 1. Header: Judul & Tombol Lokasi GPS
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = stringResource(R.string.app_name),
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
+            // Latar Belakang Animasi Cuaca Real-Time (Hujan, Petir, Cerah, Bintang, Salju, Kabut)
+            WeatherAnimatedBackground(
+                weatherCode = weatherCode,
+                isDay = isDay,
+                modifier = Modifier.fillMaxSize()
+            )
 
-                        // Tombol Lokasi GPS dengan Indikator Loading
-                        if (isGpsLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier
-                                    .padding(8.dp)
-                                    .size(24.dp),
-                                strokeWidth = 2.5.dp,
-                                color = MaterialTheme.colorScheme.primary
+            PullToRefreshBox(
+                isRefreshing = isRefreshing,
+                onRefresh = { viewModel.refresh(silent = true) },
+                modifier = Modifier.fillMaxSize()
+            ) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    // 1. Header: Judul & Tombol Lokasi GPS
+                    item {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = stringResource(R.string.app_name),
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
                             )
-                        } else {
-                            IconButton(
-                                onClick = {
+
+                            // Tombol Lokasi GPS dengan Indikator Loading
+                            if (isGpsLoading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier
+                                        .padding(8.dp)
+                                        .size(24.dp),
+                                    strokeWidth = 2.5.dp,
+                                    color = Color.White
+                                )
+                            } else {
+                                IconButton(
+                                    onClick = {
                                     val hasFine = ContextCompat.checkSelfPermission(
                                         context,
                                         Manifest.permission.ACCESS_FINE_LOCATION
@@ -652,6 +667,7 @@ fun HomeScreen(
             }
         }
     }
+}
 }
 
 /**
