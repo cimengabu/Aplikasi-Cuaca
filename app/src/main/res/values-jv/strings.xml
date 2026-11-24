@@ -162,4 +162,6 @@
     <string name="nowcast_rain_stopping_in_minutes">Udan kira-kira leren ~%1$d menit malih</string>
     <string name="nowcast_rain_continuing">Udan dikira terus lumaku sejam ngarep</string>
     <string name="nowcast_no_rain">Mboten wonten udan sakjrone 1–2 jam ngarep</string>
+    <string name="radar_empty_hint">Radar mangerteni tetesan banyu udan sacara langsung. Menawi tlatah kitha saweg padhang, layer radar bening (transparan). Nyilikake peta (-) kagem mirsani udan ing tlatah sanesipun.</string>
+    <string name="radar_zoom_out">Tingali Tlatah Wiyar</string>
 </resources>

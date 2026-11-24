@@ -162,4 +162,6 @@
     <string name="nowcast_rain_stopping_in_minutes">Rain expected to stop in ~%1$d minutes</string>
     <string name="nowcast_rain_continuing">Rain expected to continue for the next hour</string>
     <string name="nowcast_no_rain">No rain expected in the next 1–2 hours</string>
+    <string name="radar_empty_hint">Radar detects real-time rain echoes. If the local area is dry, the radar layer is transparent. Zoom out (-) to see regional storm systems.</string>
+    <string name="radar_zoom_out">View Region</string>
 </resources>

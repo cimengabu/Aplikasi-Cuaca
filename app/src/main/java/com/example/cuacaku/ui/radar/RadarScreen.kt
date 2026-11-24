@@ -25,9 +25,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -38,6 +40,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
@@ -54,7 +57,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -105,7 +107,7 @@ fun RadarScreen(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(380.dp),
+                        .height(390.dp),
                     shape = RoundedCornerShape(24.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                 ) {
@@ -161,6 +163,7 @@ fun RadarScreen(
             }
 
             is RadarUiState.Success -> {
+                // Kartu Peta Radar
                 RadarMapViewCard(
                     host = state.host,
                     frames = state.frames,
@@ -171,7 +174,7 @@ fun RadarScreen(
                     isDark = isDark
                 )
 
-                // Panel Kontrol Pemutar Animasi Radar
+                // Panel Kontrol Pemutar Animasi Radar (Play/Pause + Slider)
                 RadarControlsCard(
                     frames = state.frames,
                     currentIndex = state.currentFrameIndex,
@@ -181,6 +184,9 @@ fun RadarScreen(
                 )
             }
         }
+
+        // Catatan Penjelasan: Radar hanya tampak saat ada hujan (transparan saat kering)
+        RadarNatureHintCard()
 
         // Legenda Skala Warna Intensitas Hujan Radar
         RadarLegendCard()
@@ -254,37 +260,42 @@ private fun RadarMapViewCard(
 ) {
     val currentFrame = frames.getOrNull(currentIndex)
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
+    var isPageReady by remember { mutableStateOf(false) }
 
-    // Evaluasi javascript saat index frame berubah (tanpa reload halaman)
-    LaunchedEffect(currentFrame?.path) {
-        currentFrame?.let { frame ->
-            val radarUrl = "$host${frame.path}/256/{z}/{x}/{y}/2/1_1.png"
-            webViewRef?.evaluateJavascript("updateRadar('$radarUrl');", null)
+    // Hitung URL radar untuk frame saat ini (menggunakan skema warna NEXRAD 6 untuk visualisasi yang jelas)
+    val currentRadarUrl = remember(currentFrame?.path, host) {
+        val path = currentFrame?.path
+        if (!path.isNullOrEmpty()) "$host$path/256/{z}/{x}/{y}/6/1_1.png" else ""
+    }
+
+    // Eksekusi javascript update radar layer saat frame atau status webview berubah
+    LaunchedEffect(currentRadarUrl, isPageReady) {
+        if (isPageReady && currentRadarUrl.isNotEmpty()) {
+            webViewRef?.evaluateJavascript("window.updateRadar('$currentRadarUrl');", null)
         }
     }
 
     // Update pusat peta jika koordinat kota berubah
-    LaunchedEffect(cityLat, cityLon) {
-        webViewRef?.evaluateJavascript("centerCity($cityLat, $cityLon, '$cityName');", null)
+    LaunchedEffect(cityLat, cityLon, isPageReady) {
+        if (isPageReady) {
+            webViewRef?.evaluateJavascript("window.centerCity($cityLat, $cityLon, '$cityName');", null)
+        }
     }
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(380.dp),
+            .height(390.dp),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            val initialPath = currentFrame?.path ?: ""
-            val initialRadarUrl = if (initialPath.isNotEmpty()) "$host$initialPath/256/{z}/{x}/{y}/2/1_1.png" else ""
-
             val htmlContent = remember(cityLat, cityLon, isDark) {
                 buildLeafletHtml(
                     lat = cityLat,
                     lon = cityLon,
                     cityName = cityName,
-                    initialRadarUrl = initialRadarUrl,
+                    initialRadarUrl = currentRadarUrl,
                     isDark = isDark
                 )
             }
@@ -295,7 +306,15 @@ private fun RadarMapViewCard(
                         settings.javaScriptEnabled = true
                         settings.domStorageEnabled = true
                         settings.cacheMode = WebSettings.LOAD_DEFAULT
-                        webViewClient = object : WebViewClient() {}
+                        webViewClient = object : WebViewClient() {
+                            override fun onPageFinished(view: WebView?, url: String?) {
+                                super.onPageFinished(view, url)
+                                isPageReady = true
+                                if (currentRadarUrl.isNotEmpty()) {
+                                    view?.evaluateJavascript("window.updateRadar('$currentRadarUrl');", null)
+                                }
+                            }
+                        }
                         loadDataWithBaseURL("https://unpkg.com", htmlContent, "text/html", "UTF-8", null)
                         webViewRef = this
                     }
@@ -306,22 +325,42 @@ private fun RadarMapViewCard(
                 modifier = Modifier.fillMaxSize()
             )
 
-            // Tombol Melayang untuk Pusatkan ke Lokasi
-            FilledIconButton(
-                onClick = {
-                    webViewRef?.evaluateJavascript("centerCity($cityLat, $cityLon, '$cityName');", null)
-                },
+            // Bar Aksi Cepat di Kanan Atas: Pusatkan Lokasi & Perluas Regional
+            Row(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(12.dp)
-                    .size(40.dp),
-                shape = CircleShape
+                    .padding(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.MyLocation,
-                    contentDescription = stringResource(R.string.radar_center_my_location),
-                    modifier = Modifier.size(20.dp)
-                )
+                // Tombol Zoom Out Regional (melihat awan hujan di provinsi sekitar)
+                FilledIconButton(
+                    onClick = {
+                        webViewRef?.evaluateJavascript("window.zoomOutRegion();", null)
+                    },
+                    modifier = Modifier.size(38.dp),
+                    shape = CircleShape
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Public,
+                        contentDescription = stringResource(R.string.radar_zoom_out),
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+
+                // Tombol Pusatkan ke Lokasi Kota
+                FilledIconButton(
+                    onClick = {
+                        webViewRef?.evaluateJavascript("window.centerCity($cityLat, $cityLon, '$cityName');", null)
+                    },
+                    modifier = Modifier.size(38.dp),
+                    shape = CircleShape
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.MyLocation,
+                        contentDescription = stringResource(R.string.radar_center_my_location),
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
             }
 
             // Lencana Waktu Frame di Sudut Kiri Bawah Peta
@@ -331,7 +370,7 @@ private fun RadarMapViewCard(
                         .align(Alignment.BottomStart)
                         .padding(12.dp),
                     shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.94f),
                     shadowElevation = 4.dp
                 ) {
                     Row(
@@ -455,6 +494,39 @@ private fun RadarControlsCard(
 }
 
 // =====================================================
+// Kartu Penjelasan Sifat Radar (Transparan saat Kering)
+// =====================================================
+@Composable
+private fun RadarNatureHintCard() {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Info,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(18.dp)
+            )
+            Text(
+                text = stringResource(R.string.radar_empty_hint),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                lineHeight = 17.sp
+            )
+        }
+    }
+}
+
+// =====================================================
 // Legenda Skala Warna Intensitas Hujan Radar
 // =====================================================
 @Composable
@@ -554,10 +626,11 @@ private fun buildLeafletHtml(
     isDark: Boolean
 ): String {
     val escapedCityName = cityName.replace("'", "\\'")
+    // Gunakan CARTO basemaps yang terbukti cepat dan tidak memblokir Android WebView
     val baseTileUrl = if (isDark) {
-        "https://cartodb-basemaps-a.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png"
+        "https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"
     } else {
-        "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+        "https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png"
     }
 
     return """
@@ -574,11 +647,11 @@ private fun buildLeafletHtml(
             height: 100%;
             margin: 0;
             padding: 0;
-            background: ${if (isDark) "#1c1b1f" else "#fef7ff"};
+            background: ${if (isDark) "#1c1b1f" else "#f4f3f7"};
         }
         .leaflet-control-attribution {
-            font-size: 8px !important;
-            opacity: 0.6;
+            font-size: 7px !important;
+            opacity: 0.5;
         }
     </style>
 </head>
@@ -586,26 +659,26 @@ private fun buildLeafletHtml(
     <div id="map"></div>
     <script>
         var map = L.map('map', {
-            zoomControl: false,
+            zoomControl: true,
             attributionControl: true
-        }).setView([$lat, $lon], 8);
+        }).setView([$lat, $lon], 7);
 
         L.tileLayer('$baseTileUrl', {
             maxZoom: 18,
-            attribution: '&copy; OpenStreetMap'
+            attribution: '&copy; CARTO &copy; OSM'
         }).addTo(map);
 
         var radarLayer = null;
-        function updateRadar(url) {
+        window.updateRadar = function(url) {
             if (!url) return;
             if (radarLayer) {
                 map.removeLayer(radarLayer);
             }
             radarLayer = L.tileLayer(url, {
-                opacity: 0.72,
+                opacity: 0.85,
                 zIndex: 100
             }).addTo(map);
-        }
+        };
 
         var cityMarker = L.circleMarker([$lat, $lon], {
             radius: 8,
@@ -616,14 +689,18 @@ private fun buildLeafletHtml(
             fillOpacity: 0.9
         }).addTo(map).bindPopup('$escapedCityName');
 
-        function centerCity(newLat, newLon, newName) {
-            map.setView([newLat, newLon], 8);
+        window.centerCity = function(newLat, newLon, newName) {
+            map.setView([newLat, newLon], 7);
             if (cityMarker) {
                 cityMarker.setLatLng([newLat, newLon]).setPopupContent(newName);
             }
-        }
+        };
 
-        ${if (initialRadarUrl.isNotEmpty()) "updateRadar('$initialRadarUrl');" else ""}
+        window.zoomOutRegion = function() {
+            map.setView([$lat, $lon], 5);
+        };
+
+        ${if (initialRadarUrl.isNotEmpty()) "setTimeout(function() { window.updateRadar('$initialRadarUrl'); }, 150);" else ""}
     </script>
 </body>
 </html>

@@ -162,4 +162,6 @@
     <string name="nowcast_rain_stopping_in_minutes">Hujan diperkirakan reda dalam ~%1$d menit</string>
     <string name="nowcast_rain_continuing">Hujan diperkirakan berlanjut selama 1 jam ke depan</string>
     <string name="nowcast_no_rain">Tidak ada potensi hujan dalam 1–2 jam ke depan</string>
+    <string name="radar_empty_hint">Radar mendeteksi tetesan air hujan secara langsung. Jika wilayah kotamu sedang cerah, layer radar akan transparan. Perkecil peta (-) untuk melihat awan hujan di wilayah sekitarnya.</string>
+    <string name="radar_zoom_out">Lihat Area Luas</string>
 </resources>
