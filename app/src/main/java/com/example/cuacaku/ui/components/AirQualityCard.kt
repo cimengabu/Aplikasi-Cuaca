@@ -1,5 +1,6 @@
 package com.example.cuacaku.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
@@ -43,6 +44,7 @@ import com.example.cuacaku.util.AqiHelper
 @Composable
 fun AirQualityCard(
     airQuality: AirQualityResponse?,
+    onClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val aqiVal = airQuality?.current?.usAqi ?: return
@@ -59,7 +61,9 @@ fun AirQualityCard(
     }
 
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color(0x3B101C30) // Translucent dark glass

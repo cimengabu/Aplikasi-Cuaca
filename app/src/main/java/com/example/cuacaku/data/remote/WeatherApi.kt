@@ -43,7 +43,7 @@ interface AirQualityApi {
     suspend fun getAirQuality(
         @Query("latitude") latitude: Double,
         @Query("longitude") longitude: Double,
-        @Query("current") current: String = "us_aqi,pm10,pm2_5",
+        @Query("current") current: String = "us_aqi,pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone",
         @Query("timezone") timezone: String = "auto"
     ): AirQualityResponse
 }

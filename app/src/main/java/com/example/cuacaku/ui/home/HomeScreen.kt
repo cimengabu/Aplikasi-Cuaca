@@ -38,6 +38,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.Button
@@ -94,13 +95,20 @@ import com.example.cuacaku.ui.components.DailyForecastCard
 import com.example.cuacaku.ui.components.DayDetailBottomSheet
 import com.example.cuacaku.ui.components.HourlyRow
 import com.example.cuacaku.ui.components.HourlyTemperatureChart
+import com.example.cuacaku.ui.components.LifestyleIndicesCard
 import com.example.cuacaku.ui.components.NowcastingCard
+import com.example.cuacaku.ui.components.PollutantsBottomSheet
 import com.example.cuacaku.ui.components.SelectedDayData
+import com.example.cuacaku.ui.components.SevereWeatherAlertCard
 import com.example.cuacaku.ui.components.StatsRow
+import com.example.cuacaku.ui.components.SunMoonEphemerisCard
 import com.example.cuacaku.ui.components.WeatherAnimatedBackground
 import com.example.cuacaku.ui.components.WeatherDetailsCard
 import com.example.cuacaku.ui.components.WeatherTipsCard
+import com.example.cuacaku.ui.components.detectSevereWeather
 import com.example.cuacaku.util.AqiHelper
+import com.example.cuacaku.util.ShareWeatherHelper
+import com.example.cuacaku.util.resolveCurrentWeather
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
@@ -143,6 +151,10 @@ fun HomeScreen(
     // Bottom sheet detail hari
     var selectedDay by remember { mutableStateOf<SelectedDayData?>(null) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    // Bottom sheet detail polutan udara
+    var showPollutantsSheet by remember { mutableStateOf(false) }
+    val pollutantsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val currentLang = Locale.getDefault().language
 
@@ -260,6 +272,18 @@ fun HomeScreen(
             sheetState = sheetState,
             onDismiss = { selectedDay = null }
         )
+    }
+
+    // Modal Bottom Sheet Rincian Polutan Udara
+    if (showPollutantsSheet) {
+        val currentAqi = (uiState as? WeatherUiState.Success)?.aqi
+        if (currentAqi != null) {
+            PollutantsBottomSheet(
+                airQuality = currentAqi,
+                sheetState = pollutantsSheetState,
+                onDismiss = { showPollutantsSheet = false }
+            )
+        }
     }
 
     Scaffold(
@@ -393,6 +417,43 @@ fun HomeScreen(
                                         contentDescription = null,
                                         tint = if (isFavorite) Color(0xFFFFD700) else Color.White,
                                         modifier = Modifier.size(26.dp)
+                                    )
+                                }
+
+                                // Tombol Bagikan Laporan Cuaca
+                                IconButton(
+                                    onClick = {
+                                        val success = uiState as? WeatherUiState.Success
+                                        if (success != null) {
+                                            val curr = success.data.current
+                                            val resolved = resolveCurrentWeather(
+                                                code = curr.weatherCode,
+                                                precipitation = curr.precipitation,
+                                                cloudCover = curr.cloudCover,
+                                                isDay = curr.isDay == 1
+                                            )
+                                            val condName = context.getString(resolved.labelRes)
+                                            ShareWeatherHelper.shareWeather(
+                                                context = context,
+                                                cityName = cityName,
+                                                temperature = curr.temperature,
+                                                conditionName = condName,
+                                                conditionEmoji = resolved.emoji,
+                                                feelsLike = curr.feelsLike,
+                                                minTemp = success.data.daily.minTemp.firstOrNull(),
+                                                maxTemp = success.data.daily.maxTemp.firstOrNull(),
+                                                humidity = curr.humidity,
+                                                windSpeed = curr.windSpeed,
+                                                aqiScore = success.aqi?.current?.usAqi
+                                            )
+                                        }
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Share,
+                                        contentDescription = "Bagikan Cuaca",
+                                        tint = Color.White,
+                                        modifier = Modifier.size(23.dp)
                                     )
                                 }
                             }
@@ -593,6 +654,21 @@ fun HomeScreen(
                             }
                         }
 
+                        // 5b. Peringatan Cuaca Ekstrem (Otomatis muncul jika kondisi ekstrem)
+                        val alert = detectSevereWeather(
+                            weatherCode = data.current.weatherCode,
+                            precipitation = data.current.precipitation,
+                            windSpeed = data.current.windSpeed,
+                            temperature = data.current.temperature,
+                            uvIndex = data.daily.uvIndexMax?.firstOrNull(),
+                            aqi = aqi?.current?.usAqi
+                        )
+                        if (alert != null) {
+                            item {
+                                SevereWeatherAlertCard(alert = alert)
+                            }
+                        }
+
                         // 6. Hero Weather Section (Persis Screenshot: Suhu Raksasa & Subtitle Tunggal)
                         item {
                             val todayMin = data.daily.minTemp.firstOrNull()
@@ -626,10 +702,13 @@ fun HomeScreen(
                             }
                         }
 
-                        // 7. Kartu Kualitas Udara (Persis Card 1 di Screenshot: Leaf + Circular Gauge)
+                        // 7. Kartu Kualitas Udara (Klik untuk buka rincian polutan PM2.5, PM10, CO, NO2, SO2, O3)
                         if (aqi?.current?.usAqi != null) {
                             item {
-                                AirQualityCard(airQuality = aqi)
+                                AirQualityCard(
+                                    airQuality = aqi,
+                                    onClick = { showPollutantsSheet = true }
+                                )
                             }
                         }
 
@@ -706,6 +785,27 @@ fun HomeScreen(
                                 windSpeed = data.current.windSpeed,
                                 aqi = aqi?.current?.usAqi,
                                 weatherCode = data.current.weatherCode
+                            )
+                        }
+
+                        // 14. Indeks Gaya Hidup & Aktivitas Luar Ruangan (Jogging, Gowes, Cuci Mobil, Jemur Baju, dll)
+                        item {
+                            LifestyleIndicesCard(
+                                temperature = data.current.temperature,
+                                rainProb = data.daily.rain.firstOrNull(),
+                                windSpeed = data.current.windSpeed,
+                                humidity = data.current.humidity,
+                                cloudCover = data.current.cloudCover,
+                                uvIndex = data.daily.uvIndexMax?.firstOrNull(),
+                                aqi = aqi?.current?.usAqi
+                            )
+                        }
+
+                        // 15. Pelacak Matahari & Fase Bulan Lengkap (Ephemeris, Busur Terbit/Terbenam & Fase Lunar)
+                        item {
+                            SunMoonEphemerisCard(
+                                sunriseStr = data.daily.sunrise?.firstOrNull(),
+                                sunsetStr = data.daily.sunset?.firstOrNull()
                             )
                         }
                     }
