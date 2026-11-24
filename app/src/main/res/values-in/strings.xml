@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">CuacaKu</string>
+    <string name="app_name">Skyora</string>
 
     <!-- Navigation -->
     <string name="nav_home">Beranda</string>
@@ -29,7 +29,7 @@
     <string name="removed_from_favorites">Dihapus dari favorit</string>
 
     <!-- First Launch Welcome Banner -->
-    <string name="welcome_title">Selamat Datang di CuacaKu</string>
+    <string name="welcome_title">Selamat Datang di Skyora</string>
     <string name="welcome_desc">Gunakan lokasi saat ini dengan GPS atau cari kota untuk mulai melihat prakiraan cuaca yang akurat.</string>
     <string name="welcome_use_gps">Gunakan Lokasi Saya</string>
 

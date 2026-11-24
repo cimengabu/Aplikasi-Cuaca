@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "CuacaKu"
+rootProject.name = "Skyora"
 include(":app")
