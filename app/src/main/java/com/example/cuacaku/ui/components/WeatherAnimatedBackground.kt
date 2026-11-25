@@ -36,16 +36,53 @@ private enum class WeatherEffectType {
     FOG
 }
 
-private fun resolveEffectType(code: Int, isDay: Boolean): WeatherEffectType {
-    return when {
-        code in setOf(95, 96, 99) -> WeatherEffectType.THUNDERSTORM
-        code in setOf(51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82) -> WeatherEffectType.RAIN
-        code in setOf(71, 73, 75, 77, 85, 86) -> WeatherEffectType.SNOW
-        code in setOf(45, 48) -> WeatherEffectType.FOG
-        code in setOf(1, 2, 3) -> WeatherEffectType.CLOUDY
-        isDay -> WeatherEffectType.SUNNY
-        else -> WeatherEffectType.CLEAR_NIGHT
+/**
+ * Menentukan tipe efek cuaca yang AKURAT berdasarkan:
+ * - weatherCode  : kode WMO mentah dari API
+ * - precipitation: curah hujan aktual (mm). Jika < 0.2 mm, kode hujan/badai diabaikan
+ * - cloudCover   : persentase tutupan awan (0–100)
+ * - isDay        : siang/malam
+ *
+ * Ini memastikan background TIDAK menampilkan hujan/badai ketika curah hujan nyata hampir nol.
+ */
+private fun resolveEffectType(
+    code: Int,
+    isDay: Boolean,
+    precipitation: Double = 0.0,
+    cloudCover: Int = 0
+): WeatherEffectType {
+    // ---- Badai petir ----
+    if (code in setOf(95, 96, 99)) {
+        // Hanya tampilkan badai jika memang ada curah hujan
+        return if (precipitation >= 0.2) WeatherEffectType.THUNDERSTORM
+        else byCloudCover(cloudCover, isDay)
     }
+
+    // ---- Hujan / gerimis ----
+    if (code in setOf(51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82)) {
+        return if (precipitation >= 0.2) WeatherEffectType.RAIN
+        else byCloudCover(cloudCover, isDay)
+    }
+
+    // ---- Salju ----
+    if (code in setOf(71, 73, 75, 77, 85, 86)) return WeatherEffectType.SNOW
+
+    // ---- Kabut ----
+    if (code in setOf(45, 48)) return WeatherEffectType.FOG
+
+    // ---- Berawan (kode 2 & 3) ----
+    if (code in setOf(2, 3)) return byCloudCover(cloudCover, isDay)
+
+    // ---- Berawan sebagian (kode 1) atau cerah (kode 0) ----
+    return byCloudCover(cloudCover, isDay)
+}
+
+/** Menentukan tipe efek berdasarkan persentase tutupan awan */
+private fun byCloudCover(cloudCover: Int, isDay: Boolean): WeatherEffectType = when {
+    cloudCover >= 70 -> WeatherEffectType.CLOUDY
+    cloudCover >= 25 -> if (isDay) WeatherEffectType.SUNNY else WeatherEffectType.CLOUDY
+    isDay            -> WeatherEffectType.SUNNY
+    else             -> WeatherEffectType.CLEAR_NIGHT
 }
 
 // =====================================================
@@ -56,28 +93,56 @@ private fun resolveEffectType(code: Int, isDay: Boolean): WeatherEffectType {
 fun WeatherAnimatedBackground(
     weatherCode: Int,
     isDay: Boolean,
+    precipitation: Double = 0.0,
+    cloudCover: Int = 0,
     modifier: Modifier = Modifier
 ) {
-    val effectType = remember(weatherCode, isDay) { resolveEffectType(weatherCode, isDay) }
+    val effectType = remember(weatherCode, isDay, precipitation, cloudCover) {
+        resolveEffectType(weatherCode, isDay, precipitation, cloudCover)
+    }
 
-    // Warna gradasi dasar langit atmosferik
-    val skyColors = remember(effectType, isDay) {
+    // Warna gradasi dasar langit atmosferik — akurat per kondisi
+    val skyColors = remember(effectType, isDay, cloudCover) {
         when (effectType) {
-            WeatherEffectType.RAIN, WeatherEffectType.THUNDERSTORM -> listOf(
-                Color(0xFF0F1726), // Gelap malam kelabu atas
-                Color(0xFF1B2436), // Biru gelap berawan tengah
-                Color(0xFF141C2B)  // Bawah
+            WeatherEffectType.THUNDERSTORM -> listOf(
+                Color(0xFF0A1020), // Sangat gelap badai
+                Color(0xFF131B2D),
+                Color(0xFF0F1726)
             )
-            WeatherEffectType.SUNNY -> listOf(
-                Color(0xFF1E88E5),
-                Color(0xFF42A5F5),
-                Color(0xFF90CAF9)
+            WeatherEffectType.RAIN -> listOf(
+                Color(0xFF1A2535), // Langit hujan biru kelabu
+                Color(0xFF243040),
+                Color(0xFF1C2838)
             )
-            WeatherEffectType.CLEAR_NIGHT -> listOf(
-                Color(0xFF090E17),
-                Color(0xFF111A29),
-                Color(0xFF0D1420)
-            )
+            WeatherEffectType.SUNNY -> when {
+                cloudCover >= 50 -> listOf(  // Cerah berawan
+                    Color(0xFF3A7FBD),
+                    Color(0xFF5A9FD4),
+                    Color(0xFF7BBDE0)
+                )
+                cloudCover >= 25 -> listOf(  // Cerah sebagian
+                    Color(0xFF1E88E5),
+                    Color(0xFF42A5F5),
+                    Color(0xFF80CBFF)
+                )
+                else -> listOf(              // Cerah penuh
+                    Color(0xFF1565C0),
+                    Color(0xFF1E88E5),
+                    Color(0xFF64B5F6)
+                )
+            }
+            WeatherEffectType.CLEAR_NIGHT -> when {
+                cloudCover >= 50 -> listOf(
+                    Color(0xFF141E2B),
+                    Color(0xFF1A2638),
+                    Color(0xFF141E2B)
+                )
+                else -> listOf(
+                    Color(0xFF090E17),
+                    Color(0xFF111A29),
+                    Color(0xFF0D1420)
+                )
+            }
             WeatherEffectType.CLOUDY -> if (isDay) {
                 listOf(Color(0xFF455A64), Color(0xFF607D8B), Color(0xFF78909C))
             } else {

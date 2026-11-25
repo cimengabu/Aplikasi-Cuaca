@@ -299,16 +299,21 @@ fun HomeScreen(
         val currentWeather = (uiState as? WeatherUiState.Success)?.data?.current
         val weatherCode = currentWeather?.weatherCode ?: 0
         val isDay = currentWeather?.isDay == 1
+        // Gunakan data aktual untuk koreksi background — bukan hanya kode WMO mentah
+        val currentPrecipitation = currentWeather?.precipitation ?: 0.0
+        val currentCloudCover = currentWeather?.cloudCover ?: 0
 
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            // Latar Belakang Animasi Cuaca Real-Time (Hujan, Petir, Cerah, Bintang, Salju, Kabut)
+            // Latar Belakang Animasi Cuaca Real-Time — AKURAT berdasarkan curah hujan & tutupan awan
             WeatherAnimatedBackground(
                 weatherCode = weatherCode,
                 isDay = isDay,
+                precipitation = currentPrecipitation,
+                cloudCover = currentCloudCover,
                 modifier = Modifier.fillMaxSize()
             )
 
